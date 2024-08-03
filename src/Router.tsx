@@ -6,6 +6,7 @@ import MemberPage from './pages/Member.page';
 import BlackListPage from './pages/BlackList.page';
 import MessagePage from './pages/Message.page';
 import PostPage from './pages/Post.page';
+import GameReviewList from './pages/game-review/GameReviewList.page';
 import ChannelsPage from './pages/channels/ChannelsPage';
 import ChannelDetailPage from './pages/channels/ChannelDetailPage';
 import ChannerCreate from "./pages/channels/CreateChannel"
@@ -19,37 +20,37 @@ import { PostDetailPage } from './pages/PostDetail.page';
 
 const router = createBrowserRouter([
   {
-    path: "",
+    path: '',
     element: <Header />,
   },
 
   {
-    path: "/main",
+    path: '/main',
     element: <HomePage />,
   },
 
   {
-    path: "/login",
+    path: '/login',
     element: <LoginPage />,
   },
 
   {
-    path: "/member",
+    path: '/member',
     element: <MemberPage />,
   },
 
   {
-    path: "/post",
+    path: '/post',
     element: <PostPage />,
   },
 
   {
-    path: "/blacklist",
+    path: '/blacklist',
     element: <BlackListPage />,
   },
 
   {
-    path: "/message",
+    path: '/message',
     element: <MessagePage />,
   }, {
     path: '/channels',
@@ -79,6 +80,10 @@ const router = createBrowserRouter([
         element: <BoardCreate />,
       },
     ],
+  },
+  {
+    path: '/game-reviews',
+    element: <GameReviewList />,
   },
   {
     path: '/edit',
