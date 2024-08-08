@@ -1,3 +1,4 @@
+import { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { AppShell, Burger, Group, Title, Button, UnstyledButton } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
@@ -5,7 +6,13 @@ import { useDisclosure } from '@mantine/hooks';
 import { ColorSchemeToggleButton } from '../ColorSchemeToggleButton/ColorSchemeToggleButton';
 
 export function PageFrame(
-  { bodyContent, navbarContent, asideContent, headerContent, footerContent }
+  { bodyContent, navbarContent, asideContent, headerContent, footerContent }: {
+    bodyContent: ReactNode,
+    navbarContent: ReactNode,
+    asideContent: ReactNode,
+    headerContent: ReactNode,
+    footerContent: ReactNode
+  }
 ) {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);

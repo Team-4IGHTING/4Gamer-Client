@@ -17,28 +17,22 @@ const content =
 function UploadImagesControl() {
   const { editor } = useRichTextEditorContext();
 
-  const fileInputRef = useRef(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileUpload = async (event) => {
-    const files = Array.from(event.target.files);
-    console.log(`Files: ${files}, length: ${files.length}`);
+  const handleFileUpload = async (event: React.FormEvent<HTMLInputElement>) => {
+    const files = Array.from(event.currentTarget.files as ArrayLike<File>);
+    // console.log(`Files: ${files}, length: ${files.length}`);
     if (files) {
       for (const file of files) {
-        // var reader = new FileReader();
-        // reader.readAsDataURL(file);
-        // reader.onload = function (e) {
-        //   // console.log(e.target.result);
-        //   editor.chain().focus().setImage({ src: e.target.result }).run();
-        // }
-        editor.chain().focus().setImage({ src: URL.createObjectURL(file) }).run();
+        editor!.chain().focus().setImage({ src: URL.createObjectURL(file) }).run();
       }
     }
-    fileInputRef.current.value = null;
+    fileInputRef.current!.value = '';
   };
 
-  const handleIconClick = (event) => {
+  const handleIconClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
-    fileInputRef.current.click();
+    fileInputRef.current!.click();
   };
 
   return (
@@ -54,7 +48,7 @@ function UploadImagesControl() {
 }
 
 // export function TextEditor(editor) {
-export const TextEditor = forwardRef((props, refAlt) => {
+export const TextEditor = forwardRef<HTMLDivElement>((props, contentRef) => {
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -68,8 +62,6 @@ export const TextEditor = forwardRef((props, refAlt) => {
     ],
     content,
   });
-
-  refAlt.current = editor;
 
   return (
     // <RichTextEditor editor = {editor} ref = {ref}>
@@ -123,7 +115,7 @@ export const TextEditor = forwardRef((props, refAlt) => {
         </RichTextEditor.ControlsGroup>
       </RichTextEditor.Toolbar>
 
-      <RichTextEditor.Content ref={refAlt} />
+      <RichTextEditor.Content ref={contentRef} />
     </RichTextEditor>
   );
 });

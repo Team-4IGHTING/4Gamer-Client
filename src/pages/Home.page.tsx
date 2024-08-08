@@ -2,7 +2,7 @@ import { Text } from '@mantine/core';
 
 import { Welcome } from '../components/Welcome/Welcome';
 import { ColorSchemeToggle } from '../components/ColorSchemeToggle/ColorSchemeToggle';
-import { PageFrame } from '../components/Common/PageFrame/PageFrame.tsx';
+import { PageFrame } from '../components/Common/PageFrame/PageFrame';
 // import { FeaturesCards } from '../components/FeaturesCards/FeaturesCards';
 
 export function HomePage() {
@@ -24,7 +24,10 @@ export function HomePage() {
     <>
       <PageFrame
         bodyContent={homeBody}
+        headerContent={undefined}
         footerContent={homeFooter}
+        navbarContent={undefined}
+        asideContent={undefined}
       />
     </>
   );

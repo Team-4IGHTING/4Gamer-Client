@@ -1,19 +1,20 @@
 import { useRef } from 'react';
 import { AppShell, ScrollArea, NavLink, TextInput, Text, Button, Fieldset, Stack, TagsInput, Title } from '@mantine/core';
+import { Editor } from '@tiptap/react';
 import cheerio from 'cheerio';
 
-import { TextEditor } from '../components/TextEditor/TextEditor';
-import { PageFrame } from '../components/Common/PageFrame/PageFrame.tsx';
+import { TextEditor } from '@components/TextEditor/TextEditor';
+import { PageFrame } from '@components//Common/PageFrame/PageFrame';
 
 // import parse from 'html-react-parser';
 
 export function PostEditPage() {
-  const editorRef = useRef(null);
+  const editorContentRef = useRef<Editor & HTMLDivElement>(null);
 
   const getContent = () => {
-    if (editorRef) {
-      console.log(`Content:\n ${editorRef.current.getHTML()}`);
-      const $ = cheerio.load(editorRef.current.getHTML());
+    if (editorContentRef) {
+      console.log(`Content:\n ${editorContentRef.current!.getHTML()}`);
+      const $ = cheerio.load(editorContentRef.current!.getHTML());
       // for (let each of $('.uploaded-image')) {
       Array.from($('.uploaded-image')).forEach((each, index) => {
         console.log(`Image #${index}: ${each.attribs.src}`);
@@ -31,7 +32,7 @@ export function PostEditPage() {
           <Stack>
             <TextInput label="제목" placeholder="게시글 제목을 입력하세요" />
             <Text>본문</Text>
-            <TextEditor ref={editorRef} />
+            <TextEditor ref={editorContentRef} />
             <TagsInput label="게시글 태그" />
             <Button
               variant="filled"
@@ -68,8 +69,9 @@ export function PostEditPage() {
       <PageFrame
         bodyContent={postEditBody}
         navbarContent={postEditNavbar}
-        // asideContent = ""
-        // footerContent = ""
+        asideContent={undefined}
+        headerContent={undefined}
+        footerContent={undefined}
       />
     </>
   );

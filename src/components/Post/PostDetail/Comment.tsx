@@ -1,20 +1,11 @@
 import { ActionIcon, Text, Avatar, Group, Menu, Paper, Space } from '@mantine/core';
-
 import { IconDots, IconFlag, IconThumbUp, IconThumbDown } from '@tabler/icons-react';
 
 import classes from './Comment.module.css';
+import { metricNumber } from '@/util/numberUtil';
+import { CommentResponse } from '@/responseTypes';
 
-export function Comment({ comment }) {
-  function simplifiedNumber(n) {
-    const degrees = ['', 'K', 'M', 'B', 'T'];
-    let degreeCount = 0;
-
-    let nSimplified = n;
-    for (; nSimplified >= 1000; nSimplified /= 1000) degreeCount += 1;
-
-    return `${nSimplified}${degrees[degreeCount]}`;
-  }
-
+export function Comment({ comment }: { comment: CommentResponse }) {
   return (
     <Paper withBorder radius="md" className={classes.comment}>
       <Group justify="space-between">
@@ -34,11 +25,11 @@ export function Comment({ comment }) {
           <ActionIcon variant="transparent" color="gray">
             <IconThumbUp stroke={1.5} />
           </ActionIcon>
-          <Text>{simplifiedNumber(comment.upvotes)}</Text>
+          <Text>{metricNumber(comment.upvotes)}</Text>
           <ActionIcon variant="transparent" color="gray">
             <IconThumbDown stroke={1.5} />
           </ActionIcon>
-          <Text>{simplifiedNumber(comment.downvotes)}</Text>
+          <Text>{metricNumber(comment.downvotes)}</Text>
 
           <Menu>
             <Menu.Target>

@@ -3,20 +3,14 @@ import { useState } from 'react';
 import { ActionIcon, Badge, Group, Paper, Space, Stack, TextInput, Text, Title, TypographyStylesProvider } from '@mantine/core';
 import { IconArrowLeft, IconSend, IconThumbUp, IconThumbDown } from '@tabler/icons-react';
 
+import { metricNumber } from '@/util/numberUtil';
+import { PostResponse, CommentResponse } from '@/responseTypes';
 import { Comment } from './Comment';
 
-export function PostDetail({ post, comments }) {
-  const [newComment, setNewComment] = useState('');
-
-  function simplifiedNumber(n) {
-    const degrees = ['', 'K', 'M', 'B', 'T'];
-    let degreeCount = 0;
-
-    let nSimplified = n;
-    for (; nSimplified >= 1000; nSimplified /= 1000) degreeCount += 1;
-
-    return `${nSimplified}${degrees[degreeCount]}`;
-  }
+export function PostDetail({ post, comments }:
+  { post: PostResponse, comments: Array<CommentResponse> | null }
+) {
+  const [newCommentContent, setNewCommentContent] = useState('');
 
   return (
     <Stack gap="xl">
@@ -31,10 +25,10 @@ export function PostDetail({ post, comments }) {
           <Group justify="space-between">
             <Title order={1} lineClamp={1}>{post.title}</Title>
           </Group>
-          <Text c="dimmed">By {post.author} @ {post.createdAt} (마지막 수정: {post.updatedAt})</Text>
+          <Text c="dimmed">{`By ${post.author} @ ${post.createdAt} (마지막 수정: ${post.updatedAt})`}</Text>
           <Space h="xl" />
           <Group justify="space-between">
-            <Group>
+            {/* <Group>
             {
               post.tags.map((value, index) =>
                 <Badge key={index} color="blue">
@@ -42,16 +36,16 @@ export function PostDetail({ post, comments }) {
                 </Badge>
               )
             }
-            </Group>
+            </Group> */}
             <Group>
               <ActionIcon variant="transparent" color="gray">
                 <IconThumbUp stroke={1.5} />
               </ActionIcon>
-              <Text>{simplifiedNumber(post.upvotes)}</Text>
+              <Text>{metricNumber(post.upvotes)}</Text>
               <ActionIcon variant="transparent" color="gray">
                 <IconThumbDown stroke={1.5} />
               </ActionIcon>
-              <Text>{simplifiedNumber(post.downvotes)}</Text>
+              <Text>{metricNumber(post.downvotes)}</Text>
             </Group>
           </Group>
         </Paper>
@@ -64,9 +58,9 @@ export function PostDetail({ post, comments }) {
       </Stack>
       <Paper withBorder p="xl">
         <Stack gap="md">
-          <Title order={2}>댓글 ({comments.length}개)</Title>
+          <Title order={2}>댓글 ({comments ? comments.length : 0}개)</Title>
           {
-            comments.map((eachComment, index) =>
+            comments?.map((eachComment: CommentResponse, index: number) =>
               <Comment key={index} comment={eachComment} />
             )
           }
@@ -74,8 +68,8 @@ export function PostDetail({ post, comments }) {
         <Space h="xl" />
         <TextInput
           placeholder="댓글 입력..."
-          value={newComment}
-          onChange={(event) => setNewComment(event.currentTarget.value)}
+          value={newCommentContent}
+          onChange={(event) => setNewCommentContent(event.currentTarget.value)}
           rightSection={
             <>
               <ActionIcon>
