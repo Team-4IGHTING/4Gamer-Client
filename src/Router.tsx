@@ -1,5 +1,5 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import Header from './components/layout/Header';
+import Header from './components/layout/WebsocketConnection';
 import { HomePage } from './pages/Home.page';
 import LoginPage from './pages/Login.page';
 import MemberPage from './pages/Member.page';
@@ -14,6 +14,7 @@ import ChannelModify from "./pages/channels/ModifyChannel"
 import ChannelAdminPage from "./pages/channels/ChannelAdminPage"
 import BoardCreate from "./pages/channels/CreateBoard"
 import { GoogleLogin } from './pages/GoogleLogin.page';
+import UserProfile from './components/UserProfile';
 
 import { PostEditPage } from './pages/PostEdit.page';
 import { PostListPage } from './pages/PostList.page';
@@ -89,6 +90,11 @@ const router = createBrowserRouter([
   {
     path: '/game-reviews',
     element: <GameReviewList />,
+  },
+  
+  {
+    path: '/user/:memberId',
+    element: <UserProfile />,
   },
   {
     path: '/edit',
