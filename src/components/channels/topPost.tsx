@@ -4,8 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { topPost } from '../../api/channelApi';
 
 
-export function TopPost() {
-    const { channelId } = useParams<{ channelId: string }>();
+export function TopPost(channelId: any) {
     const [topPosts, setTopPosts] = useState<Post[]>([]);
     const ref = useRef<HTMLDivElement | null>(null);
     const navigate = useNavigate();

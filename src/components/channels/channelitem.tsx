@@ -37,12 +37,10 @@ const ChannelList = ({ fetchChannels }: ChannelListProps) => {
 
     const handleCreateClick = async () => {
         try {
-            // 로봇 여부 체크
             const result = await checkIsRobot();
             if (result.score < 0.8) {
                 throw new Error('사람이 아님');
             }
-            // 검증됐을 때 할 행동
             navigate("/channels/new")
         } catch (error) {
             console.error("Failed to check robot status:", error);

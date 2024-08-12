@@ -220,7 +220,7 @@ export function ChannelAdminPage() {
                 </Container>
 
 
-            } navbarContent={undefined} asideContent={TopPost} headerContent={undefined} footerContent={undefined}>
+            } navbarContent={undefined} asideContent={TopPost(channelId)} headerContent={undefined} footerContent={undefined}>
 
             </PageFrame>
         </>
