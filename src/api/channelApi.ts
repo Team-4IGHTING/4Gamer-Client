@@ -30,8 +30,14 @@ export const deleteChannel = async (channelId: any) => {
   return response.data;
 };
 
-export const searchGameTitle = async (gameTitle: string) => {
+export const searchGameTitle = async (gameTitle: any) => {
   const response = await client.post(`/api/v1/igdb/get-name?gameTitle=${gameTitle}`);
+
+  return response.data;
+};
+
+export const topPost = async (channelId: any) => {
+  const response = await client.get(`/api/v1/channels/${channelId}/top-posts`);
 
   return response.data;
 };

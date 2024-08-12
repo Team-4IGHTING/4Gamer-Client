@@ -1,4 +1,4 @@
-import { Button, Container, Group, TextInput, Textarea, Autocomplete, Loader } from '@mantine/core';
+import { Button, Container, Group, TextInput, Textarea, Loader } from '@mantine/core';
 import { useState, useEffect, FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getBoard, updateBoards } from '../../api/boardApi';

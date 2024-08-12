@@ -16,6 +16,7 @@ import BoardCreate from "./pages/channels/CreateBoard"
 import BoardModify from "./pages/channels/ModifyBoard"
 import { GoogleLogin } from './pages/GoogleLogin.page';
 import UserProfile from './components/UserProfile';
+import TopPost from './components/channels/topPost';
 
 const router = createBrowserRouter([
   {
@@ -96,6 +97,10 @@ const router = createBrowserRouter([
   {
     path: '/user/:memberId',
     element: <UserProfile />,
+  },
+  {
+    path: '/test/:channelId',
+    element: <TopPost />,
   },
 ]);
 
