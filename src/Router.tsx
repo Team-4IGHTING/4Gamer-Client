@@ -13,8 +13,8 @@ import ChannerCreate from "./pages/channels/CreateChannel"
 import ChannelModify from "./pages/channels/ModifyChannel"
 import ChannelAdminPage from "./pages/channels/ChannelAdminPage"
 import BoardCreate from "./pages/channels/CreateBoard"
+import BoardModify from "./pages/channels/ModifyBoard"
 import { GoogleLogin } from './pages/GoogleLogin.page';
-import UserProfile from './components/UserProfile';
 
 import { PostEditPage } from './pages/PostEdit.page';
 import { PostListPage } from './pages/PostList.page';
@@ -42,12 +42,12 @@ const router = createBrowserRouter([
   },
 
   {
-    path: '/post',
+    path: '/posts',
     element: <PostPage />,
   },
 
   {
-    path: '/blacklist',
+    path: '/blacklist/:channelId',
     element: <BlackListPage />,
   },
   {
@@ -85,13 +85,17 @@ const router = createBrowserRouter([
         path: ':channelId/boards/new',
         element: <BoardCreate />,
       },
+      {
+        path: ':channelId/boards/:boardId/edit',
+        element: <BoardModify />,
+      },
     ],
   },
   {
     path: '/game-reviews',
     element: <GameReviewList />,
   },
-  
+
   {
     path: '/user/:memberId',
     element: <UserProfile />,
