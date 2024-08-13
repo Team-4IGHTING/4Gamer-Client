@@ -1,25 +1,63 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { Link as RouterLink } from 'react-router-dom';
 
-import { ActionIcon, Badge, Group, Paper, Space, Stack, TextInput, Text, Title, TypographyStylesProvider } from '@mantine/core';
+import { ActionIcon, Badge, Group, Paper, Space, Stack, TextInput, Text, Title, TypographyStylesProvider, UnstyledButton } from '@mantine/core';
 import { IconArrowLeft, IconSend, IconThumbUp, IconThumbDown } from '@tabler/icons-react';
 
+import { generateHTML } from '@tiptap/core';
+import { Link } from '@mantine/tiptap';
+import Highlight from '@tiptap/extension-highlight';
+import StarterKit from '@tiptap/starter-kit';
+import Underline from '@tiptap/extension-underline';
+import TextAlign from '@tiptap/extension-text-align';
+import Superscript from '@tiptap/extension-superscript';
+import SubScript from '@tiptap/extension-subscript';
+
+import Image from '@tiptap/extension-image';
+
 import { metricNumber } from '@/util/numberUtil';
-import { PostResponse, CommentResponse } from '@/responseTypes';
+import { PostResponse, PostTagResponse, CommentResponse } from '@/responseTypes';
 import { Comment } from './Comment';
 
-export function PostDetail({ post, comments }:
-  { post: PostResponse, comments: Array<CommentResponse> | null }
+export function PostDetail({ post, comments, tags }:
+  { post: PostResponse,
+    comments: Array<CommentResponse> | null,
+    tags: Array<PostTagResponse> | null
+  }
 ) {
   const [newCommentContent, setNewCommentContent] = useState('');
+  const [bodyContent, setBodyContent] = useState<string>('');
+
+  const editorExtensions = [
+    StarterKit,
+    Underline,
+    Link,
+    Superscript,
+    SubScript,
+    Highlight,
+    TextAlign.configure({ types: ['heading', 'paragraph'] }),
+    Image.configure({ inline: true, allowBase64: false, HTMLAttributes: { class: 'uploaded-image' } }),
+  ];
+
+  useEffect(() => {
+    setBodyContent(
+      generateHTML(
+        JSON.parse(post.body),
+        editorExtensions
+      )
+    );
+  }, [post]);
 
   return (
     <Stack gap="xl">
-      <Group>
-        <ActionIcon variant="transparent" color="gray">
-          <IconArrowLeft stroke={1.5} />
-        </ActionIcon>
-        <Text>게시판으로 돌아가기</Text>
-      </Group>
+      <UnstyledButton component={RouterLink} to="../" relative="path">
+        <Group>
+          <ActionIcon variant="transparent" color="gray">
+            <IconArrowLeft stroke={1.5} />
+          </ActionIcon>
+          <Text>게시판으로 돌아가기</Text>
+        </Group>
+      </UnstyledButton>
       <Stack>
         <Paper withBorder p="xl">
           <Group justify="space-between">
@@ -28,15 +66,15 @@ export function PostDetail({ post, comments }:
           <Text c="dimmed">{`By ${post.author} @ ${post.createdAt} (마지막 수정: ${post.updatedAt})`}</Text>
           <Space h="xl" />
           <Group justify="space-between">
-            {/* <Group>
+            <Group>
             {
-              post.tags.map((value, index) =>
+              tags?.map((value, index) =>
                 <Badge key={index} color="blue">
-                  #{value}
+                  #{value.name}
                 </Badge>
               )
             }
-            </Group> */}
+            </Group>
             <Group>
               <ActionIcon variant="transparent" color="gray">
                 <IconThumbUp stroke={1.5} />
@@ -52,7 +90,7 @@ export function PostDetail({ post, comments }:
         {/* <Divider my="xl" /> */}
         <Paper withBorder p="xl">
           <TypographyStylesProvider>
-            <div dangerouslySetInnerHTML={{ __html: post.body }} />
+            <div dangerouslySetInnerHTML={{ __html: bodyContent }} />
           </TypographyStylesProvider>
         </Paper>
       </Stack>

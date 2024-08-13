@@ -27,3 +27,11 @@ export type BoardResponse = {
   createdAt: string,
   updatedAt: string
 };
+
+export type PostTagResponse = {
+  name: string
+};
+
+export type S3GetResponseDto = {
+  fileNames: string[]
+};

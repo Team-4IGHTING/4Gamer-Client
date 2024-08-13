@@ -40,13 +40,13 @@ export function PostSummary({ post }: { post: PostResponse }) {
           </Group>
 
           <Group justify="space-between">
-            <UnstyledButton component={Link} to={`/post/${post.id}`} w="70%">
+            <UnstyledButton component={Link} to={`./${post.id}`} relative="path" w="70%">
               <Title order={3} lineClamp={1}>{post.title}</Title>
             </UnstyledButton>
             <Group justify="space-between" w="360">
               <Group>
                 <IconEye stroke={1.5} />
-                <Text>{metricNumber(post.views)}</Text>
+                <Text>{metricNumber(post.view)}</Text>
               </Group>
               {/* <Group>
                 <ActionIcon variant="transparent" color="gray">

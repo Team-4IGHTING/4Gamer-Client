@@ -1,18 +1,9 @@
-import { RichTextEditor, Link, useRichTextEditorContext } from '@mantine/tiptap';
-import { useEditor } from '@tiptap/react';
-import Highlight from '@tiptap/extension-highlight';
-import StarterKit from '@tiptap/starter-kit';
-import Underline from '@tiptap/extension-underline';
-import TextAlign from '@tiptap/extension-text-align';
-import Superscript from '@tiptap/extension-superscript';
-import SubScript from '@tiptap/extension-subscript';
-
-import Image from '@tiptap/extension-image';
-import { IconPhotoPlus } from '@tabler/icons-react';
 import { useRef, forwardRef } from 'react';
 
-const content =
-  '<h2 style="text-align: center;">Welcome to Mantine rich text editor</h2><p><code>RichTextEditor</code> component focuses on usability and is designed to be as simple as possible to bring a familiar editing experience to regular users. <code>RichTextEditor</code> is based on <a href="https://tiptap.dev/" rel="noopener noreferrer" target="_blank">Tiptap.dev</a> and supports all of its features:</p><ul><li>General text formatting: <strong>bold</strong>, <em>italic</em>, <u>underline</u>, <s>strike-through</s> </li><li>Headings (h1-h6)</li><li>Sub and super scripts (<sup>&lt;sup /&gt;</sup> and <sub>&lt;sub /&gt;</sub> tags)</li><li>Ordered and bullet lists</li><li>Text align&nbsp;</li><li>And all <a href="https://tiptap.dev/extensions" target="_blank" rel="noopener noreferrer">other extensions</a></li></ul>';
+import { RichTextEditor, useRichTextEditorContext } from '@mantine/tiptap';
+import { IconPhotoPlus } from '@tabler/icons-react';
+import { generateHTML } from '@tiptap/core';
+import { Editor, useEditor } from '@tiptap/react';
 
 function UploadImagesControl() {
   const { editor } = useRichTextEditorContext();
@@ -21,10 +12,9 @@ function UploadImagesControl() {
 
   const handleFileUpload = async (event: React.FormEvent<HTMLInputElement>) => {
     const files = Array.from(event.currentTarget.files as ArrayLike<File>);
-    // console.log(`Files: ${files}, length: ${files.length}`);
     if (files) {
       for (const file of files) {
-        editor!.chain().focus().setImage({ src: URL.createObjectURL(file) }).run();
+        editor!.chain().focus().setImage({ src: URL.createObjectURL(file), title: 'image', alt: 'image' }).run();
       }
     }
     fileInputRef.current!.value = '';
@@ -41,30 +31,26 @@ function UploadImagesControl() {
       aria-label="Insert image"
       title="Insert image"
     >
-        <IconPhotoPlus stroke={1.5} size="1rem" />
-        <input type="file" ref={fileInputRef} onChange={handleFileUpload} name="imagePicker" hidden multiple />
+      <IconPhotoPlus stroke={1.5} size="1rem" />
+      <input type="file" ref={fileInputRef} onChange={handleFileUpload} name="imagePicker" hidden multiple />
     </RichTextEditor.Control>
   );
 }
 
-// export function TextEditor(editor) {
-export const TextEditor = forwardRef<HTMLDivElement>((props, contentRef) => {
+export const TextEditor =
+forwardRef<Editor, { extensions: any, content: any }>((props: any, editorRef: any) => {
   const editor = useEditor({
-    extensions: [
-      StarterKit,
-      Underline,
-      Link,
-      Superscript,
-      SubScript,
-      Highlight,
-      TextAlign.configure({ types: ['heading', 'paragraph'] }),
-      Image.configure({ inline: true, allowBase64: false, HTMLAttributes: { class: 'uploaded-image' } }),
-    ],
-    content,
+    extensions: props.extensions,
+    content: props.content
+      ? generateHTML(
+          JSON.parse(props.content),
+          props.extensions
+        )
+      : '',
   });
+  editorRef!.current! = editor;
 
   return (
-    // <RichTextEditor editor = {editor} ref = {ref}>
     <RichTextEditor editor={editor}>
       <RichTextEditor.Toolbar sticky stickyOffset={60}>
         <RichTextEditor.ControlsGroup>
@@ -115,7 +101,8 @@ export const TextEditor = forwardRef<HTMLDivElement>((props, contentRef) => {
         </RichTextEditor.ControlsGroup>
       </RichTextEditor.Toolbar>
 
-      <RichTextEditor.Content ref={contentRef} />
+      {/* <RichTextEditor.Content ref={contentRef} /> */}
+      <RichTextEditor.Content />
     </RichTextEditor>
   );
 });
