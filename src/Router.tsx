@@ -15,6 +15,7 @@ import ChannelAdminPage from "./pages/channels/ChannelAdminPage"
 import BoardCreate from "./pages/channels/CreateBoard"
 import BoardModify from "./pages/channels/ModifyBoard"
 import { GoogleLogin } from './pages/GoogleLogin.page';
+import TopGamePage from './pages/TopGame.page';
 
 import { PostEditPage } from './pages/PostEdit.page';
 import { PostListPage } from './pages/PostList.page';
@@ -97,6 +98,9 @@ const router = createBrowserRouter([
   },
 
   {
+    path: '/top-game',
+    element: <TopGamePage />
+  }
     path: '/user/:memberId',
     element: <UserProfile />,
   },
