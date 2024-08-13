@@ -9,11 +9,11 @@ import PostPage from './pages/Post.page';
 import GameReviewList from './pages/game-review/GameReviewList.page';
 import ChannelsPage from './pages/channels/ChannelsPage';
 import ChannelDetailPage from './pages/channels/ChannelDetailPage';
-import ChannerCreate from "./pages/channels/CreateChannel"
-import ChannelModify from "./pages/channels/ModifyChannel"
-import ChannelAdminPage from "./pages/channels/ChannelAdminPage"
-import BoardCreate from "./pages/channels/CreateBoard"
-import BoardModify from "./pages/channels/ModifyBoard"
+import ChannerCreate from './pages/channels/CreateChannel';
+import ChannelModify from './pages/channels/ModifyChannel';
+import { ChannelAdminPage } from './pages/channels/ChannelAdminPage';
+import BoardCreate from './pages/channels/CreateBoard';
+import BoardModify from './pages/channels/ModifyBoard';
 import { GoogleLogin } from './pages/GoogleLogin.page';
 import TopGamePage from './pages/TopGame.page';
 
@@ -52,7 +52,7 @@ const router = createBrowserRouter([
     element: <BlackListPage />,
   },
   {
-    path: "/login/google",
+    path: '/login/google"',
     element: <GoogleLogin />,
   },
 
@@ -99,10 +99,7 @@ const router = createBrowserRouter([
 
   {
     path: '/top-game',
-    element: <TopGamePage />
-  }
-    path: '/user/:memberId',
-    element: <UserProfile />,
+    element: <TopGamePage />,
   },
   {
     path: '/edit',
