@@ -13,7 +13,7 @@ jobs:
       - name: Install mustache (to update the date)
         run: apk add ruby && gem install mustache
       - name: delete yarn
-        run: rm ./yarn.lock
+        run: rm -rf node_modules package-lock.json yarn.lock
       - name: creates output
         run: sh ./build.sh
       - name: Pushes to another repository
