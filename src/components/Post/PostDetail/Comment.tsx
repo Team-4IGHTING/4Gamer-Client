@@ -20,8 +20,8 @@ export function Comment({ channelId, boardId, postId, commentId, comment }:
   const TRUE = 2;
 
   const [isUpvoting, setIsUpvoting] = useState<number>(comment.isUpvoting);
-  const [upvotes, setUpvotes] = useState<number>(comment.upvotes);
-  const [downvotes, setDownvotes] = useState<number>(comment.downvotes);
+  const [upvotes, setUpvotes] = useState<bigint>(comment.upvotes);
+  const [downvotes, setDownvotes] = useState<bigint>(comment.downvotes);
   const memberId = localStorage.getItem('4gamer_member_id');
   const [isModifying, setIsModifying] = useState<boolean>(false);
   // const [commentContent, setCommentContent] = useState<string>(comment.content);
@@ -45,31 +45,31 @@ export function Comment({ channelId, boardId, postId, commentId, comment }:
 
   const deleteCommentInternal = async () => {
     await deleteComment(channelId, boardId, postId, commentId);
-    windows.location.reload();
+    window.location.reload();
   };
 
   const setCommentReaction = async (newIsUpvoting: number) => {
     if (newIsUpvoting === NULL) {
       await deleteCommentReaction(channelId, boardId, postId, commentId);
       if (isUpvoting === TRUE) {
-        setUpvotes(upvotes - 1);
+        setUpvotes(BigInt(upvotes) - 1n);
       } else {
-        setDownvotes(downvotes - 1);
+        setDownvotes(BigInt(downvotes) - 1n);
       }
       setIsUpvoting(NULL);
     } else {
       await updateCommentReaction(channelId, boardId, postId, commentId, (newIsUpvoting === TRUE));
       if (isUpvoting !== NULL) {
         if (newIsUpvoting === TRUE) {
-          setDownvotes(downvotes - 1);
+          setDownvotes(BigInt(downvotes) - 1n);
         } else {
-          setUpvotes(upvotes - 1);
+          setUpvotes(BigInt(upvotes) - 1n);
         }
       }
       if (newIsUpvoting === TRUE) {
-        setUpvotes(upvotes + 1);
+        setUpvotes(BigInt(upvotes) + 1n);
       } else {
-        setDownvotes(downvotes + 1);
+        setDownvotes(BigInt(downvotes) + 1n);
       }
       setIsUpvoting(newIsUpvoting);
     }
@@ -164,7 +164,7 @@ export function Comment({ channelId, boardId, postId, commentId, comment }:
           </Group>
         </Group>
         <Space h="xl" />
-        <Group>
+        <Group grow>
           {isModifying
             ? (
               <TextInput

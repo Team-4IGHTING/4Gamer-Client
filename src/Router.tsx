@@ -35,32 +35,40 @@ const router = createBrowserRouter([
 
   {
     path: '/login',
-    element: <LoginPage />,
+    children: [
+      {
+        path: '',
+        element: <LoginPage />,
+      },
+      {
+        path: 'google',
+        element: <GoogleLogin />,
+      },
+    ],
   },
 
   {
     path: '/member',
-    element: <MemberPage />,
+    children: [
+      {
+        path: '',
+        element: <MemberPage />,
+      },
+      {
+        path: 'message',
+        element: <MessagePage />,
+      },
+      {
+        path: 'posts',
+        element: <PostPage />,
+      },
+    ],
   },
 
-  {
-    path: '/posts',
-    element: <PostPage />,
-  },
-
-  {
-    path: '/blacklist/:channelId',
-    element: <BlackListPage />,
-  },
-  {
-    path: '/login/google',
-    element: <GoogleLogin />,
-  },
-
-  {
-    path: '/message',
-    element: <MessagePage />,
-  },
+  // {
+  //   path: '/blacklist/:channelId',
+  //   element: <BlackListPage />,
+  // },
   {
     path: '/channels',
     children: [
@@ -85,7 +93,16 @@ const router = createBrowserRouter([
           },
           {
             path: 'admin',
-            element: <ChannelAdminPage />,
+            children: [
+              {
+                path: '',
+                element: <ChannelAdminPage />,
+              },
+              {
+                path: 'blacklist',
+                element: <BlackListPage />,
+              },
+            ],
           },
           {
             path: 'boards',
@@ -139,22 +156,9 @@ const router = createBrowserRouter([
     path: '/game-reviews',
     element: <GameReviewList />,
   },
-
   {
     path: '/top-game',
     element: <TopGamePage />,
-  },
-  {
-    path: '/edit',
-    element: <PostEditPage />,
-  },
-  {
-    path: '/posts',
-    element: <PostListPage />,
-  },
-  {
-    path: '/channels/:channelId/boards/:boardId/posts/:postId',
-    element: <PostDetailPage />,
   },
 ]);
 

@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { ActionIcon, Avatar, Group, Menu, Paper, Stack, Text, Title, Tooltip, UnstyledButton } from '@mantine/core';
 import { IconDots, IconEye, IconPencil, IconThumbDown, IconThumbDownFilled, IconThumbUp, IconThumbUpFilled, IconTrash } from '@tabler/icons-react';
 
+import { deletePost } from '@api/posts';
 import { updatePostReaction, deletePostReaction } from '@api/reaction';
 
 import { prettyTime } from '@/util/dateUtil';
@@ -25,31 +26,31 @@ export function PostSummary({ channelId, boardId, postId, post }:
   };
 
   const [isUpvoting, setIsUpvoting] = useState<number>(post.isUpvoting);
-  const [upvotes, setUpvotes] = useState<number>(post.upvotes);
-  const [downvotes, setDownvotes] = useState<number>(post.downvotes);
+  const [upvotes, setUpvotes] = useState<bigint>(post.upvotes);
+  const [downvotes, setDownvotes] = useState<bigint>(post.downvotes);
 
   const setPostReaction = async (newIsUpvoting: number) => {
     if (newIsUpvoting === NULL) {
       await deletePostReaction(channelId, boardId, postId);
       if (isUpvoting === TRUE) {
-        setUpvotes(upvotes - 1);
+        setUpvotes(upvotes - 1n);
       } else {
-        setDownvotes(downvotes - 1);
+        setDownvotes(downvotes - 1n);
       }
       setIsUpvoting(NULL);
     } else {
       await updatePostReaction(channelId, boardId, postId, (newIsUpvoting === TRUE));
       if (isUpvoting !== NULL) {
         if (newIsUpvoting === TRUE) {
-          setDownvotes(downvotes - 1);
+          setDownvotes(downvotes - 1n);
         } else {
-          setUpvotes(upvotes - 1);
+          setUpvotes(upvotes - 1n);
         }
       }
       if (newIsUpvoting === TRUE) {
-        setUpvotes(upvotes + 1);
+        setUpvotes(upvotes + 1n);
       } else {
-        setDownvotes(downvotes + 1);
+        setDownvotes(downvotes + 1n);
       }
       setIsUpvoting(newIsUpvoting);
     }
@@ -109,7 +110,7 @@ export function PostSummary({ channelId, boardId, postId, post }:
             <Group justify="space-between" w="300">
               <Group>
                 <IconEye stroke={1.5} />
-                <Tooltip label={post.view}>
+                <Tooltip label={`${post.view}`}>
                   <Text>{metricNumber(post.view)}</Text>
                 </Tooltip>
               </Group>
@@ -135,7 +136,7 @@ export function PostSummary({ channelId, boardId, postId, post }:
                     : <IconThumbUp stroke={1.5} />
                   }
                 </ActionIcon>
-                <Tooltip label={upvotes}>
+                <Tooltip label={`${upvotes}`}>
                   <Text>{metricNumber(upvotes)}</Text>
                 </Tooltip>
               </Group>
@@ -155,7 +156,7 @@ export function PostSummary({ channelId, boardId, postId, post }:
                   : <IconThumbDown stroke={1.5} />
                 }
               </ActionIcon>
-                <Tooltip label={downvotes}>
+                <Tooltip label={`${downvotes}`}>
                   <Text>{metricNumber(downvotes)}</Text>
                 </Tooltip>
               </Group>

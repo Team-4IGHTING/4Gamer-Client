@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { AppShell, NavLink, ScrollArea } from '@mantine/core';
 
 import { getBoards } from '@api/boardApi';
+import { getBlacklist } from '@api/channelApi';
 import { getMemberInfo } from '@api/member';
 import { getPost, getTagsInPost, getComments } from '@api/posts';
 import { getPostReactionList, getCommentReactionList } from '@api/reaction';
-import { BoardResponse, CommentResponse, PostResponse, PostTagResponse, ReactionResponse } from '@/responseTypes';
+import { BoardResponse, ChannelBlacklistResponse, CommentResponse, PostResponse, PostTagResponse, ReactionResponse } from '@/responseTypes';
 
 import { PageFrame } from '@/components/Common/PageFrame/PageFrame';
 import { PostDetail } from '@/components/Post/PostDetail/PostDetail';
@@ -15,6 +16,8 @@ export function PostDetailPage() {
   const { channelId, boardId, postId } = (
     useParams() as unknown
   ) as { channelId: bigint, boardId: bigint, postId: bigint };
+  const navigate = useNavigate();
+  const memberId = localStorage.getItem('4gamer_member_id');
   const [boards, setBoards] = useState<BoardResponse[]>([]);
   const [post, setPost] = useState<PostResponse | null>(null);
   const [comments, setComments] = useState<Array<CommentResponse & { isUpvoting: boolean }>>([]);
@@ -22,6 +25,14 @@ export function PostDetailPage() {
   const [postReactionList, setPostReactionList] = useState<Array<ReactionResponse>>([]);
   const [commentReactionList, setCommentReactionList] = useState<Array<ReactionResponse>>([]);
   const accessToken = localStorage.getItem('accessToken');
+
+  const checkBlacklists = async () => {
+    const data = await getBlacklist(`${channelId}`);
+    if (data.some((each: ChannelBlacklistResponse) => each.memberId === memberId)) {
+      alert('해당 채널로의 접근이 차단되었습니다. 관리자에게 문의하세요.');
+      navigate('/');
+    }
+  };
 
   const getMemberId = async () => {
     if (accessToken !== null) {
@@ -60,6 +71,7 @@ export function PostDetailPage() {
   };
 
   useEffect(() => {
+    checkBlacklists();
     fetchBoards(channelId);
     fetchPost(channelId, boardId, postId);
     fetchTags(channelId, boardId, postId);

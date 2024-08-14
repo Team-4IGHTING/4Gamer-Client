@@ -39,14 +39,14 @@ export function PostDetail({ channelId, boardId, postId }:
   const memberId = localStorage.getItem('4gamer_member_id');
   const navigate = useNavigate();
   const [post, setPost] = useState<PostResponse | null>(null);
-  const [comments, setComments] = useState<Array<CommentResponse & { isUpvoting: boolean }>>([]);
+  const [comments, setComments] = useState<Array<CommentResponse & { isUpvoting: number }>>([]);
   const [tags, setTags] = useState<Array<PostTagResponse>>([]);
-  const [upvotes, setUpvotes] = useState<number>(0);
-  const [downvotes, setDownvotes] = useState<number>(0);
+  const [upvotes, setUpvotes] = useState<bigint>(0n);
+  const [downvotes, setDownvotes] = useState<bigint>(0n);
   const [isUpvoting, setIsUpvoting] = useState<number>(NULL);
   const { ref, inView } = useInView();
-  const [commentsPage, setCommentsPage] = useState<bigint>(0);
-  const commentsSize = 10;
+  const [commentsPage, setCommentsPage] = useState<bigint>(0n);
+  const commentsSize = 10n;
   const [isCommentsAllLoaded, setIsCommentsAllLoaded] = useState<boolean>(false);
   const [totalComments, setTotalComments] = useState<bigint>(0n);
 
@@ -99,8 +99,8 @@ export function PostDetail({ channelId, boardId, postId }:
     setDownvotes(data.downvotes);
 
     setIsUpvoting(
-      postReactions.some((reaction) => (reaction.id === data.id))
-      ? (postReactions.find((reaction) => (
+      postReactions.some((reaction: ReactionResponse) => (reaction.id === data.id))
+      ? (postReactions.find((reaction: ReactionResponse) => (
             reaction.id === data.id
           )).isUpvoting ? TRUE : FALSE
         )
@@ -115,16 +115,16 @@ export function PostDetail({ channelId, boardId, postId }:
       setTotalComments(data.totalElements);
       if (!data.last) {
         setIsCommentsAllLoaded(false);
-        setCommentsPage(commentsPage + 1);
+        setCommentsPage(commentsPage + 1n);
       } else {
         setIsCommentsAllLoaded(true);
       }
-      await setComments(data.content.map((each) => (
+      await setComments(data.content.map((each: CommentResponse) => (
         {
           ...each,
           isUpvoting: (
-            commentReactions.some((reaction) => (reaction.id === each.id))
-            ? (commentReactions.find((reaction) => (
+            commentReactions.some((reaction: ReactionResponse) => (reaction.id === each.id))
+            ? (commentReactions.find((reaction: ReactionResponse) => (
                   reaction.id === each.id
                 )).isUpvoting ? TRUE : FALSE
               )
@@ -147,23 +147,23 @@ export function PostDetail({ channelId, boardId, postId }:
     if (newIsUpvoting === NULL) {
       await deletePostReaction(channelId, boardId, postId);
       if (isUpvoting === TRUE) {
-        setUpvotes(upvotes - 1);
+        setUpvotes(BigInt(upvotes) - 1n);
       } else {
-        setDownvotes(downvotes - 1);
+        setDownvotes(BigInt(downvotes) - 1n);
       }
     } else {
       await updatePostReaction(channelId, boardId, postId, (newIsUpvoting === TRUE));
       if (isUpvoting !== NULL) {
         if (newIsUpvoting === TRUE) {
-          setDownvotes(downvotes - 1);
+          setDownvotes(BigInt(downvotes) - 1n);
         } else {
-          setUpvotes(upvotes - 1);
+          setUpvotes(BigInt(upvotes) - 1n);
         }
       }
       if (newIsUpvoting === TRUE) {
-        setUpvotes(upvotes + 1);
+        setUpvotes(BigInt(upvotes) + 1n);
       } else {
-        setDownvotes(downvotes + 1);
+        setDownvotes(BigInt(downvotes) + 1n);
       }
     }
     setIsUpvoting(newIsUpvoting);
@@ -289,7 +289,7 @@ export function PostDetail({ channelId, boardId, postId }:
         </Stack>
         <Paper withBorder p="xl">
           <Stack gap="md">
-            <Title order={2}>댓글 ({totalComments}개)</Title>
+            <Title order={2}>댓글 ({`${totalComments}`}개)</Title>
             {
               comments?.map(
                 (eachComment: CommentResponse & { isUpvoting: number }, index: number) =>

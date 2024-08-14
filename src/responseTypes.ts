@@ -48,10 +48,15 @@ export type PostTagResponse = {
 };
 
 export type ReactionResponse = {
-  id: number;
+  id: bigint;
   isUpvoting: boolean;
 };
 
 export type S3GetResponseDto = {
   fileNames: string[]
+};
+
+export type ChannelBlacklistResponse = {
+  channelId: bigint,
+  memberId: string
 };

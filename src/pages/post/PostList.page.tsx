@@ -1,29 +1,33 @@
 import { useEffect, useState, Fragment } from 'react';
 import { useInView } from 'react-intersection-observer';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { AppShell, ScrollArea, NavLink, Stack, Title } from '@mantine/core';
 
 import { getBoards } from '@api/boardApi';
+import { getBlacklist } from '@api/channelApi';
 import { getPosts } from '@api/posts';
 import { getPostReactionList } from '@api/reaction';
 
 import { PageFrame } from '@components/Common/PageFrame/PageFrame';
 import { PostSummary } from '@components/Post/PostList/PostSummary';
 
-import { PostSimplifiedResponse, BoardResponse } from '@/responseTypes';
+import { ChannelBlacklistResponse, PostSimplifiedResponse, ReactionResponse, BoardResponse } from '@/responseTypes';
+
+type PostSimplifiedResponseWithReaction = PostSimplifiedResponse & { isUpvoting: number};
 
 export function PostListPage() {
   const NULL = 0;
   const FALSE = 1;
   const TRUE = 2;
 
+  const navigate = useNavigate();
   const { channelId, boardId } = (useParams() as unknown) as { channelId: bigint, boardId: bigint };
   const memberId = localStorage.getItem('4gamer_member_id');
-  const [posts, setPosts] = useState<Array<PostSimplifiedResponse>>([]);
+  const [posts, setPosts] = useState<Array<PostSimplifiedResponse & { isUpvoting: number }>>([]);
   const [boards, setBoards] = useState<Array<BoardResponse>>([]);
   const { ref, inView } = useInView();
-  const [postsPage, setPostsPage] = useState<bigint>(0);
-  const postsSize = 10;
+  const [postsPage, setPostsPage] = useState<bigint>(0n);
+  const postsSize = 10n;
   const [isPostsAllLoaded, setIsPostsAllLoaded] = useState<boolean>(false);
 
   const fetchBoards = async () => {
@@ -36,16 +40,16 @@ export function PostListPage() {
       const data = await getPosts(channelId, boardId, postsPage, postsSize);
       if (!data.last) {
         setIsPostsAllLoaded(false);
-        setPostsPage(postsPage + 1);
+        setPostsPage(postsPage + 1n);
       } else {
         setIsPostsAllLoaded(true);
       }
-      await setPosts(data.content.map((each) => (
+      await setPosts(data.content.map((each: PostSimplifiedResponse) => (
         {
           ...each,
           isUpvoting: (
-            postReactions.some((reaction) => (reaction.id === each.id))
-            ? (postReactions.find((reaction) => (
+            postReactions.some((reaction: ReactionResponse) => (reaction.id === each.id))
+            ? (postReactions.find((reaction: ReactionResponse) => (
                   reaction.id === each.id
                 )).isUpvoting ? TRUE : FALSE
               )
@@ -55,8 +59,16 @@ export function PostListPage() {
       )).concat(posts));
     }
   };
+  const checkBlacklists = async () => {
+    const data = await getBlacklist(`${channelId}`);
+    if (data.some((each: ChannelBlacklistResponse) => each.memberId === memberId)) {
+      alert('해당 채널로의 접근이 차단되었습니다. 관리자에게 문의하세요.');
+      navigate('/');
+    }
+  };
 
   useEffect(() => {
+    checkBlacklists();
     fetchBoards();
     fetchPosts();
   }, [channelId, boardId]);

@@ -16,13 +16,14 @@ import Superscript from '@tiptap/extension-superscript';
 import SubScript from '@tiptap/extension-subscript';
 
 import { getBoards } from '@api/boardApi';
+import { getBlacklist } from '@api/channelApi';
 import { getPost, getTagsInPost, updatePost } from '@api/posts';
 import { getImages, getPresignedUrl, deleteImage } from '@api/fileUpload';
 
 import { TextEditor } from '@components/TextEditor/TextEditor';
 import { PageFrame } from '@components/Common/PageFrame/PageFrame';
 
-import { BoardResponse, PostResponse, PostTagResponse } from '@/responseTypes';
+import { BoardResponse, ChannelBlacklistResponse, PostResponse, PostTagResponse } from '@/responseTypes';
 
 async function uploadToS3(url: string, file: File, contentType: string) {
   return axios.put(
@@ -60,6 +61,7 @@ type RouterParams = {
 
 export function PostEditPage() {
   const { channelId, boardId, postId } = useParams() as RouterParams;
+  const memberId = localStorage.getItem('4gamer_member_id');
   const navigate = useNavigate();
   const [tags, setTags] = useState<string[]>([]);
   const [boards, setBoards] = useState<BoardResponse[]>([]);
@@ -85,6 +87,14 @@ export function PostEditPage() {
     Image.configure({ inline: true, allowBase64: false, HTMLAttributes: { class: 'uploaded-image' } }),
   ];
   const editorRef = useRef<Editor>(null);
+
+  const checkBlacklists = async () => {
+    const data = await getBlacklist(channelId);
+    if (data.some((each: ChannelBlacklistResponse) => each.memberId === memberId)) {
+      alert('해당 채널로의 접근이 차단되었습니다. 관리자에게 문의하세요.');
+      navigate('/');
+    }
+  };
 
   async function uploadImagesFrom(images: Array<any>, attachmentPrefix: string) {
     const bucketName = import.meta.env.VITE_AMAZON_S3_BUCKET_NAME;
@@ -171,6 +181,7 @@ export function PostEditPage() {
   };
 
   useEffect(() => {
+    checkBlacklists();
     fetchBoards(channelId);
     fetchPost(channelId, boardId, postId);
     fetchTags(channelId, boardId, postId);
@@ -212,11 +223,11 @@ export function PostEditPage() {
 
   const postEditNavbar = (
     <>
-      <AppShell.Section>Navbar header</AppShell.Section>
+      <AppShell.Section>게시판 목록</AppShell.Section>
       <AppShell.Section grow my="md" component={ScrollArea}>
         {
           boards.map((each, index) => (
-            <NavLink component={RouterLink} to={`../../${each.id}/posts`} relative="path" key={index} label={each.title} />
+            <NavLink component={RouterLink} to={`../../../../${each.id}/posts`} relative="path" key={index} label={each.title} />
           ))
         }
       </AppShell.Section>

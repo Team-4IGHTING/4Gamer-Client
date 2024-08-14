@@ -124,6 +124,8 @@ export function BlackListContainer() {
     setLoadingMore(true);
 
     try {
+      if (!channelId) return;
+
       const data = await getBlacklist(channelId);
 
       if (Array.isArray(data)) {

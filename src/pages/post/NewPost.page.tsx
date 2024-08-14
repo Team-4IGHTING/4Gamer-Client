@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { MouseEvent, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { MouseEvent, useEffect, useRef, useState } from 'react';
+import { Link as RouterLink, useNavigate, useParams } from 'react-router-dom';
 import { v7 as uuid } from 'uuid';
 
 import { AppShell, ScrollArea, NavLink, TextInput, Text, Button, Fieldset, Stack, TagsInput, Title } from '@mantine/core';
@@ -15,11 +15,15 @@ import TextAlign from '@tiptap/extension-text-align';
 import Superscript from '@tiptap/extension-superscript';
 import SubScript from '@tiptap/extension-subscript';
 
+import { getBoards } from '@api/boardApi';
+import { getBlacklist } from '@api/channelApi';
 import { createPost } from '@api/posts';
 import { getPresignedUrl } from '@api/fileUpload';
 
 import { TextEditor } from '@components/TextEditor/TextEditor';
 import { PageFrame } from '@components/Common/PageFrame/PageFrame';
+
+import { BoardResponse, ChannelBlacklistResponse } from '@/responseTypes';
 
 async function uploadToS3(url: string, file: File, contentType: string) {
   return axios.put(
@@ -49,14 +53,11 @@ function findAllImageTags(json: any) {
   return imageTags;
 }
 
-type RouterParams = {
-  channelId: string;
-  boardId: string;
-};
-
 export function NewPostPage() {
-  const { channelId, boardId } = useParams() as RouterParams;
+  const { channelId, boardId } = (useParams() as unknown) as { channelId: bigint, boardId: bigint };
+  const memberId = localStorage.getItem('4gamer_member_id');
   const navigate = useNavigate();
+  const [boards, setBoards] = useState<BoardResponse[]>([]);
   const [tags, setTags] = useState<string[]>([]);
   const [{
     value: postTitle,
@@ -65,7 +66,7 @@ export function NewPostPage() {
   }, setPostTitle] = useValidatedState<string>(
     '',
     (title) => (title.length >= 1 && title.length <= 128),
-    false
+    true
   );
 
   const editorExtensions = [
@@ -127,7 +128,25 @@ export function NewPostPage() {
     }
   };
 
-  const postEditBody = (
+  const checkBlacklists = async () => {
+    const data = await getBlacklist(`${channelId}`);
+    if (data.some((each: ChannelBlacklistResponse) => each.memberId === memberId)) {
+      alert('해당 채널로의 접근이 차단되었습니다. 관리자에게 문의하세요.');
+      navigate('/');
+    }
+  };
+
+  const fetchBoards = async () => {
+    const data = await getBoards(BigInt(channelId));
+    setBoards(data);
+  };
+
+  useEffect(() => {
+    checkBlacklists();
+    fetchBoards();
+  }, []);
+
+  const newPostBody = (
     <>
       <Stack>
         <Title order={1}>게시글 작성</Title>
@@ -161,28 +180,24 @@ export function NewPostPage() {
     </>
   );
 
-  const postEditNavbar = (
+  const newPostNavbar = (
     <>
-      <AppShell.Section>Navbar header</AppShell.Section>
+      <AppShell.Section>게시판 목록</AppShell.Section>
       <AppShell.Section grow my="md" component={ScrollArea}>
-      60 links in a scrollable section
-      {Array(60)
-        .fill(0)
-        .map((_, index) => (
-          // <Skeleton key={index} h={28} mt="sm" animate={false} />
-          <NavLink key={index} href="#required-for-focus" label={index} />
-        ))
-      }
+        {
+          boards.map((each, index) => (
+            <NavLink component={RouterLink} to={`../../../${each.id}/posts`} relative="path" key={index} label={each.title} />
+          ))
+        }
       </AppShell.Section>
-      <AppShell.Section>Navbar footer – always at the bottom</AppShell.Section>
     </>
   );
 
   return (
     <>
       <PageFrame
-        bodyContent={postEditBody}
-        navbarContent={postEditNavbar}
+        bodyContent={newPostBody}
+        navbarContent={newPostNavbar}
         asideContent={undefined}
         headerContent={undefined}
         footerContent={undefined}
