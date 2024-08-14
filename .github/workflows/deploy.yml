@@ -12,6 +12,8 @@ jobs:
       - uses: actions/checkout@v2
       - name: Install mustache (to update the date)
         run: apk add ruby && gem install mustache
+      - name: delete yarn
+        run: sudo rm ./yarn.lock
       - name: creates output
         run: sh ./build.sh
       - name: Pushes to another repository
@@ -21,7 +23,7 @@ jobs:
           API_TOKEN_GITHUB: ${{ secrets.AUTO_TOKEN }}
         with:
           source-directory: 'output'
-          destination-github-username: 'taeaeaeae'
+          destination-github-username: 'taeaeaeae'
           destination-repository-name: '4Gamer-Client'
           user-email: ${{ secrets.OFFICIAL_ACCOUNT_EMAIL }}
           commit-message: ${{ github.event.commits[0].message }}
