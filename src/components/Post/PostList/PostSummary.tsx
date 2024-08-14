@@ -7,6 +7,8 @@ import { IconDots, IconEye, IconPencil, IconThumbDown, IconThumbDownFilled, Icon
 import { deletePost } from '@api/posts';
 import { updatePostReaction, deletePostReaction } from '@api/reaction';
 
+import UserProfile from '@components/UserProfile';
+
 import { prettyTime } from '@/util/dateUtil';
 import { metricNumber } from '@/util/numberUtil';
 import { PostSimplifiedResponse } from '@/responseTypes';
@@ -64,7 +66,9 @@ export function PostSummary({ channelId, boardId, postId, post }:
           <Group justify="space-between">
             <Group>
               <Avatar radius="xl" />
-              <Text>{post.author}</Text>
+              <UserProfile memberId={post.memberId}>
+                <Text>{post.author}</Text>
+              </UserProfile>
               <Text>{prettyTime(post.createdAt)}</Text>
             </Group>
             <Group>

@@ -6,7 +6,9 @@ import { IconDeviceFloppy, IconDots, IconPencil, IconThumbUp, IconThumbUpFilled,
 
 import { deleteComment, updateComment } from '@api/comment';
 import { updateCommentReaction, deleteCommentReaction } from '@api/reaction';
-// import classes from './Comment.module.css';
+
+import UserProfile from '@components/UserProfile';
+
 import { prettyTime } from '@/util/dateUtil';
 import { metricNumber } from '@/util/numberUtil';
 import { CommentResponse } from '@/responseTypes';
@@ -92,7 +94,9 @@ export function Comment({ channelId, boardId, postId, commentId, comment }:
               radius="xl"
             />
             <div>
-              <Text fz="sm">{comment.author}</Text>
+              <UserProfile memberId={comment.memberId}>
+                <Text fz="sm">{comment.author}</Text>
+              </UserProfile>
               <Text fz="xs" c="dimmed">{prettyTime(comment.createdAt)}</Text>
             </div>
           </Group>

@@ -21,6 +21,9 @@ import { getMemberInfo } from '@api/member';
 import { getPost, getTagsInPost, getComments, deletePost } from '@api/posts';
 import { addComment } from '@api/comment';
 import { deletePostReaction, getPostReactionList, getCommentReactionList, updatePostReaction } from '@api/reaction';
+
+import UserProfile from '@components/UserProfile';
+
 import { CommentResponse, PostResponse, PostTagResponse, ReactionResponse } from '@/responseTypes';
 
 import { metricNumber } from '@/util/numberUtil';
@@ -232,7 +235,13 @@ export function PostDetail({ channelId, boardId, postId }:
                 ) : <></>
               }
             </Group>
-            <Text c="dimmed">{`By ${post.author} @ ${prettyTime(post.createdAt)} (마지막 수정: ${prettyTime(post.updatedAt)})`}</Text>
+            <Space h="xs" />
+            <Group>
+              <UserProfile memberId={post.memberId}>
+                <Text c="dimmed">By {post.author}</Text>
+              </UserProfile>
+              <Text c="dimmed">@ {prettyTime(post.createdAt)} 마지막 수정: ${prettyTime(post.updatedAt)}</Text>
+            </Group>
             <Space h="xl" />
             <Group justify="space-between">
               <Group>
