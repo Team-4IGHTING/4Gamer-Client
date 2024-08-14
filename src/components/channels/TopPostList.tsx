@@ -5,7 +5,7 @@ import { Divider, Group, Paper, Space, Stack, Text, Title } from '@mantine/core'
 
 import { getTopPostList } from '@api/channelApi';
 
-export function TopPostList(channelId: number) {
+export function TopPostList({ channelId }: { channelId: number }) {
   const [topPosts, setTopPosts] = useState([]);
 
   useEffect(() => {

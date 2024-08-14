@@ -1,19 +1,18 @@
 import { useEffect, useState, Fragment } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { AppShell, ScrollArea, NavLink, Stack, Title } from '@mantine/core';
+import { AppShell, Button, ScrollArea, NavLink, Stack, Title } from '@mantine/core';
 
-import { getBoards } from '@api/boardApi';
-import { getBlacklist } from '@api/channelApi';
+import { getBoard, getBoards } from '@api/boardApi';
+import { getBlacklist, getChannelItem } from '@api/channelApi';
 import { getPosts } from '@api/posts';
 import { getPostReactionList } from '@api/reaction';
 
 import { PageFrame } from '@components/Common/PageFrame/PageFrame';
 import { PostSummary } from '@components/Post/PostList/PostSummary';
+import { TopPost } from '@components/channels/topPost';
 
 import { ChannelBlacklistResponse, PostSimplifiedResponse, ReactionResponse, BoardResponse } from '@/responseTypes';
-
-type PostSimplifiedResponseWithReaction = PostSimplifiedResponse & { isUpvoting: number};
 
 export function PostListPage() {
   const NULL = 0;
@@ -29,15 +28,29 @@ export function PostListPage() {
   const [postsPage, setPostsPage] = useState<bigint>(0n);
   const postsSize = 10n;
   const [isPostsAllLoaded, setIsPostsAllLoaded] = useState<boolean>(false);
+  const [boardTitle, setBoardTitle] = useState<string>('');
+  const [channelTitle, setChannelTitle] = useState<string>('');
+
+  const fetchChannel = async () => {
+    const response = await getChannelItem(channelId);
+    setChannelTitle(response.title);
+  };
 
   const fetchBoards = async () => {
     const data = await getBoards(channelId);
     setBoards(data);
   };
+
+  const fetchBoard = async () => {
+    const response = await getBoard(channelId, boardId);
+    setBoardTitle(response.title);
+  };
+
   const fetchPosts = async () => {
     if (inView && !isPostsAllLoaded) {
       const postReactions = await getPostReactionList();
       const data = await getPosts(channelId, boardId, postsPage, postsSize);
+      console.log(data);
       if (!data.last) {
         setIsPostsAllLoaded(false);
         setPostsPage(postsPage + 1n);
@@ -69,7 +82,9 @@ export function PostListPage() {
 
   useEffect(() => {
     checkBlacklists();
+    fetchChannel();
     fetchBoards();
+    fetchBoard();
     fetchPosts();
   }, [channelId, boardId]);
 
@@ -80,6 +95,7 @@ export function PostListPage() {
   const postListBody = (
     <>
       <Stack gap="xl">
+        <Button fullWidth component={Link} to="./new" relative="path">게시물 작성하기</Button>
         {posts
           .map((each, index) => (
             <Fragment key={index}>
@@ -106,8 +122,7 @@ export function PostListPage() {
   );
 
   const postListHeader = (
-    // <Title order={3}>{channelTitle} / {boardTitle}</Title>
-    <Title order={3}>Bruh</Title>
+    <Title order={3}>{channelTitle} / {boardTitle}</Title>
   );
 
   return (
@@ -116,7 +131,9 @@ export function PostListPage() {
         bodyContent={postListBody}
         navbarContent={postListNavbar}
         headerContent={postListHeader}
-        asideContent={undefined}
+        asideContent={
+          <TopPost channelId={channelId} />
+        }
         footerContent={undefined}
       />
     </>

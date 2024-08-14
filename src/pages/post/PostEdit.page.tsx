@@ -15,13 +15,14 @@ import TextAlign from '@tiptap/extension-text-align';
 import Superscript from '@tiptap/extension-superscript';
 import SubScript from '@tiptap/extension-subscript';
 
-import { getBoards } from '@api/boardApi';
-import { getBlacklist } from '@api/channelApi';
+import { getBoard, getBoards } from '@api/boardApi';
+import { getBlacklist, getChannelItem } from '@api/channelApi';
 import { getPost, getTagsInPost, updatePost } from '@api/posts';
 import { getImages, getPresignedUrl, deleteImage } from '@api/fileUpload';
 
 import { TextEditor } from '@components/TextEditor/TextEditor';
 import { PageFrame } from '@components/Common/PageFrame/PageFrame';
+import { TopPost } from '@components/channels/topPost';
 
 import { BoardResponse, ChannelBlacklistResponse, PostResponse, PostTagResponse } from '@/responseTypes';
 
@@ -54,13 +55,13 @@ function findAllImageTags(json: any) {
 }
 
 type RouterParams = {
-  channelId: string;
-  boardId: string;
-  postId: string;
+  channelId: bigint;
+  boardId: bigint;
+  postId: bigint;
 };
 
 export function PostEditPage() {
-  const { channelId, boardId, postId } = useParams() as RouterParams;
+  const { channelId, boardId, postId } = (useParams() as unknown) as RouterParams;
   const memberId = localStorage.getItem('4gamer_member_id');
   const navigate = useNavigate();
   const [tags, setTags] = useState<string[]>([]);
@@ -75,6 +76,8 @@ export function PostEditPage() {
     (title) => (title.length >= 1 && title.length <= 128),
     false
   );
+  const [boardTitle, setBoardTitle] = useState<string>('');
+  const [channelTitle, setChannelTitle] = useState<string>('');
 
   const editorExtensions = [
     StarterKit,
@@ -89,7 +92,7 @@ export function PostEditPage() {
   const editorRef = useRef<Editor>(null);
 
   const checkBlacklists = async () => {
-    const data = await getBlacklist(channelId);
+    const data = await getBlacklist(`${channelId}`);
     if (data.some((each: ChannelBlacklistResponse) => each.memberId === memberId)) {
       alert('해당 채널로의 접근이 차단되었습니다. 관리자에게 문의하세요.');
       navigate('/');
@@ -164,34 +167,44 @@ export function PostEditPage() {
     }
   };
 
-  const fetchBoards = async (cId: string) => {
-    const data = await getBoards(BigInt(cId));
+  const fetchChannel = async () => {
+    const response = await getChannelItem(channelId);
+    setChannelTitle(response.title);
+  };
+
+  const fetchBoards = async () => {
+    const data = await getBoards(channelId);
     setBoards(data);
   };
 
-  const fetchPost = async (cId: string, bId: string, pId: string) => {
-    const data = await getPost(BigInt(cId), BigInt(bId), BigInt(pId));
+  const fetchBoard = async () => {
+    const response = await getBoard(channelId, boardId);
+    setBoardTitle(response.title);
+  };
+
+  const fetchPost = async () => {
+    const data = await getPost(channelId, boardId, postId);
     setPost(data);
     setPostTitle(data.title);
   };
 
-  const fetchTags = async (cId: string, bId: string, pId: string) => {
-    const data = await getTagsInPost(BigInt(cId), BigInt(bId), BigInt(pId));
+  const fetchTags = async () => {
+    const data = await getTagsInPost(channelId, boardId, postId);
     setTags(data.map((each: PostTagResponse) => each.name));
   };
 
   useEffect(() => {
     checkBlacklists();
-    fetchBoards(channelId);
-    fetchPost(channelId, boardId, postId);
-    fetchTags(channelId, boardId, postId);
+    fetchChannel();
+    fetchBoards();
+    fetchBoard();
+    fetchPost();
+    fetchTags();
   }, []);
 
   const postEditBody = (
     <>
       <Stack>
-        <Title order={1}>게시글 작성</Title>
-        <Title order={2}>게시판</Title>
         <Fieldset legend="게시글 정보">
           <Stack>
             <TextInput
@@ -234,14 +247,24 @@ export function PostEditPage() {
     </>
   );
 
+  const postEditHeader = (
+    <Title order={3}>{channelTitle} / {boardTitle} / 게시물 수정</Title>
+  );
+
+  if (post!.memberId !== memberId) {
+    alert('해당 페이지에 대한 수정 권한이 없습니다.');
+    navigate('../');
+  }
   if (post) {
     return (
       <>
         <PageFrame
           bodyContent={postEditBody}
           navbarContent={postEditNavbar}
-          asideContent={undefined}
-          headerContent={undefined}
+          asideContent={
+            <TopPost channelId={channelId} />
+          }
+          headerContent={postEditHeader}
           footerContent={undefined}
         />
       </>

@@ -15,13 +15,14 @@ import TextAlign from '@tiptap/extension-text-align';
 import Superscript from '@tiptap/extension-superscript';
 import SubScript from '@tiptap/extension-subscript';
 
-import { getBoards } from '@api/boardApi';
-import { getBlacklist } from '@api/channelApi';
+import { getBoard, getBoards } from '@api/boardApi';
+import { getBlacklist, getChannelItem } from '@api/channelApi';
 import { createPost } from '@api/posts';
 import { getPresignedUrl } from '@api/fileUpload';
 
 import { TextEditor } from '@components/TextEditor/TextEditor';
 import { PageFrame } from '@components/Common/PageFrame/PageFrame';
+import { TopPost } from '@components/channels/topPost';
 
 import { BoardResponse, ChannelBlacklistResponse } from '@/responseTypes';
 
@@ -56,6 +57,7 @@ function findAllImageTags(json: any) {
 export function NewPostPage() {
   const { channelId, boardId } = (useParams() as unknown) as { channelId: bigint, boardId: bigint };
   const memberId = localStorage.getItem('4gamer_member_id');
+  const accessToken = localStorage.getItem('accessToken');
   const navigate = useNavigate();
   const [boards, setBoards] = useState<BoardResponse[]>([]);
   const [tags, setTags] = useState<string[]>([]);
@@ -68,6 +70,8 @@ export function NewPostPage() {
     (title) => (title.length >= 1 && title.length <= 128),
     true
   );
+  const [boardTitle, setBoardTitle] = useState<string>('');
+  const [channelTitle, setChannelTitle] = useState<string>('');
 
   const editorExtensions = [
     StarterKit,
@@ -136,21 +140,31 @@ export function NewPostPage() {
     }
   };
 
+  const fetchChannel = async () => {
+    const response = await getChannelItem(channelId);
+    setChannelTitle(response.title);
+  };
+
   const fetchBoards = async () => {
-    const data = await getBoards(BigInt(channelId));
+    const data = await getBoards(channelId);
     setBoards(data);
+  };
+
+  const fetchBoard = async () => {
+    const response = await getBoard(channelId, boardId);
+    setBoardTitle(response.title);
   };
 
   useEffect(() => {
     checkBlacklists();
+    fetchChannel();
     fetchBoards();
+    fetchBoard();
   }, []);
 
   const newPostBody = (
     <>
       <Stack>
-        <Title order={1}>게시글 작성</Title>
-        <Title order={2}>게시판</Title>
         <Fieldset legend="게시글 정보">
           <Stack>
             <TextInput
@@ -193,13 +207,23 @@ export function NewPostPage() {
     </>
   );
 
+  const newPostHeader = (
+    <Title order={3}>{channelTitle} / {boardTitle} / 새 게시물</Title>
+  );
+
+  if (accessToken === null) {
+    alert('회원만 게시글을 작성할 수 있습니다. 로그인을 먼저 진행해 주세요.');
+    navigate('/login');
+  }
   return (
     <>
       <PageFrame
         bodyContent={newPostBody}
         navbarContent={newPostNavbar}
-        asideContent={undefined}
-        headerContent={undefined}
+        asideContent={
+          <TopPost channelId={channelId} />
+        }
+        headerContent={newPostHeader}
         footerContent={undefined}
       />
     </>
