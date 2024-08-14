@@ -1,5 +1,6 @@
 import { Text } from '@mantine/core';
 
+import { TopGameContainer } from '@components/TopGameContainer';
 import { Welcome } from '../components/Welcome/Welcome';
 import { ColorSchemeToggle } from '../components/ColorSchemeToggle/ColorSchemeToggle';
 import { PageFrame } from '../components/Common/PageFrame/PageFrame';
@@ -27,7 +28,7 @@ export function HomePage() {
         headerContent={undefined}
         footerContent={homeFooter}
         navbarContent={undefined}
-        asideContent={undefined}
+        asideContent={<TopGameContainer />}
       />
     </>
   );

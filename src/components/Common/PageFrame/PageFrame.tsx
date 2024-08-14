@@ -42,10 +42,28 @@ export function PageFrame(
               <Title order={1}>4Gamer</Title>
             </UnstyledButton>
           </Group>
+          {headerContent}
           <Group>
-          <WebsocketConnection />
-            <Button variant="filled">Button</Button>
-            <Button variant="filled">Button</Button>
+            <WebsocketConnection />
+            <>
+              {localStorage.getItem('accessToken') ?
+                <Button
+                  variant="filled"
+                  component={Link}
+                  to="/member"
+                >
+                  내 정보
+                </Button>
+                :
+                <Button
+                  variant="filled"
+                  component={Link}
+                  to="/login"
+                >
+                  로그인
+                </Button>
+              }
+            </>
             <ColorSchemeToggleButton />
             <Burger opened={mobileAsideOpened} onClick={toggleMobileAside} hiddenFrom="sm" size="sm" />
             <Burger opened={desktopAsideOpened} onClick={toggleDesktopAside} visibleFrom="sm" size="sm" />
