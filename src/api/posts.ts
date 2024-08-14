@@ -5,8 +5,8 @@ export const createPost = async (channelId: bigint, boardId: bigint, post: any) 
     return response.data;
 };
 
-export const getPosts = async (channelId: bigint, boardId: bigint) => {
-    const response = await client.get(`/api/v1/channels/${channelId}/boards/${boardId}/posts`);
+export const getPosts = async (channelId: bigint, boardId: bigint, page: bigint, size: bigint) => {
+    const response = await client.get(`/api/v1/channels/${channelId}/boards/${boardId}/posts?page=${page}&size=${size}`);
     return response.data;
 };
 
@@ -30,8 +30,8 @@ export const getTagsInPost = async (channelId: bigint, boardId: bigint, postId: 
     return response.data;
 };
 
-export const getComments = async (channelId: bigint, boardId: bigint, postId: bigint) => {
-    const response = await client.get(`/api/v1/channels/${channelId}/boards/${boardId}/posts/${postId}/comments`);
+export const getComments = async (channelId: bigint, boardId: bigint, postId: bigint, page: bigint, size: bigint) => {
+    const response = await client.get(`/api/v1/channels/${channelId}/boards/${boardId}/posts/${postId}/comments?page=${page}&size=${size}`);
     return response.data;
 };
 

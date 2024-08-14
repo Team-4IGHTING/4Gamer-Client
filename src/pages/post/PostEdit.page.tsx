@@ -90,17 +90,18 @@ export function PostEditPage() {
     const bucketName = import.meta.env.VITE_AMAZON_S3_BUCKET_NAME;
     const bucketRegion = import.meta.env.VITE_AMAZON_S3_BUCKET_REGION;
     const oldBlobUrls = Array<string>();
-    const remainingImageUrls = new Set<string>();
+    const remainingImages = new Set<string>();
 
     const previousImagesResponse = await getImages(attachmentPrefix);
     const previousImages = previousImagesResponse.fileNames;
     previousImages.sort();
-    const previousImagesSet = new Set(previousImages.map((each) => each.split('amazonaws.com/')[1]));
-    console.log(previousImagesSet);
+    // console.log(previousImages);
+    const previousImagesSet = new Set(previousImages.map((each: string) => each.split(`${attachmentPrefix}/`)[1]));
+    // console.log(previousImagesSet);
     const lastIndex = BigInt(previousImages[previousImages.length - 1].split('/')[1].split('.')[0]);
-    console.log(lastIndex);
+    // console.log(lastIndex);
 
-    const index = lastIndex;
+    let index = lastIndex + 1n;
 
     for (const [_, image] of images.entries()) {
       if (image.attrs.src.startsWith('blob')) {
@@ -116,12 +117,16 @@ export function PostEditPage() {
         oldBlobUrls.push(url);
         image.attrs.src = `https://${bucketName}.s3.${bucketRegion}.amazonaws.com/${filename}`;
         console.log(image.attrs.src);
+        index += 1n;
       } else if (image.attrs.src.startsWith(`https://${bucketName}.s3.${bucketRegion}.amazonaws.com`)) {
-        remainingImageUrls.add(image.attrs.src);
+        remainingImages.add(image.attrs.src.split(`${attachmentPrefix}/`)[1]);
       }
     }
-    console.log(previousImagesSet.difference(remainingImageUrls))
-    // for (const [_, oldImage] of previousImagesSet.difference(remainingImageUrls))
+    // console.log(remainingImages);
+    // console.log(previousImagesSet.difference(remainingImages));
+    for (const oldImage of previousImagesSet.difference(remainingImages)) {
+      await deleteImage(`${attachmentPrefix}/${oldImage}`);
+    }
     oldBlobUrls.forEach((url) => URL.revokeObjectURL(url));
   }
 

@@ -1,53 +1,191 @@
-import { ActionIcon, Text, Avatar, Group, Menu, Paper, Space } from '@mantine/core';
-import { IconDots, IconFlag, IconThumbUp, IconThumbDown } from '@tabler/icons-react';
+import { useEffect, useState } from 'react';
 
-import classes from './Comment.module.css';
+import { ActionIcon, Text, Avatar, Group, Menu, Paper, Space, TextInput, TypographyStylesProvider } from '@mantine/core';
+import { useValidatedState } from '@mantine/hooks';
+import { IconDeviceFloppy, IconDots, IconPencil, IconThumbUp, IconThumbUpFilled, IconThumbDown, IconThumbDownFilled, IconTrash } from '@tabler/icons-react';
+
+import { deleteComment, updateComment } from '@api/comment';
+import { updateCommentReaction, deleteCommentReaction } from '@api/reaction';
+// import classes from './Comment.module.css';
+import { prettyTime } from '@/util/dateUtil';
 import { metricNumber } from '@/util/numberUtil';
 import { CommentResponse } from '@/responseTypes';
 
-export function Comment({ comment }: { comment: CommentResponse }) {
-  return (
-    <Paper withBorder radius="md" className={classes.comment}>
-      <Group justify="space-between">
-        <Group>
-          <Avatar
-            src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-2.png"
-            alt="Jacob Warnhalter"
-            radius="xl"
-          />
-          <div>
-            <Text fz="sm">{comment.author}</Text>
-            <Text fz="xs" c="dimmed">{comment.createdAt}</Text>
-          </div>
-        </Group>
+export function Comment({ channelId, boardId, postId, commentId, comment }:
+  { channelId: bigint, boardId: bigint, postId: bigint, commentId: bigint,
+    // comment: CommentResponse, isCommentUpvoting: number }) {
+      comment: CommentResponse & { isUpvoting: number } }) {
+  const NULL = 0;
+  const FALSE = 1;
+  const TRUE = 2;
 
-        <Group>
-          <ActionIcon variant="transparent" color="gray">
-            <IconThumbUp stroke={1.5} />
-          </ActionIcon>
-          <Text>{metricNumber(comment.upvotes)}</Text>
-          <ActionIcon variant="transparent" color="gray">
-            <IconThumbDown stroke={1.5} />
-          </ActionIcon>
-          <Text>{metricNumber(comment.downvotes)}</Text>
+  const [isUpvoting, setIsUpvoting] = useState<number>(comment.isUpvoting);
+  const [upvotes, setUpvotes] = useState<number>(comment.upvotes);
+  const [downvotes, setDownvotes] = useState<number>(comment.downvotes);
+  const memberId = localStorage.getItem('4gamer_member_id');
+  const [isModifying, setIsModifying] = useState<boolean>(false);
+  // const [commentContent, setCommentContent] = useState<string>(comment.content);
 
-          <Menu>
-            <Menu.Target>
-              <ActionIcon variant="transparent" color="gray">
-                <IconDots stroke={1.5} />
-              </ActionIcon>
-            </Menu.Target>
-
-            <Menu.Dropdown>
-              <Menu.Item leftSection={<IconFlag stroke={1.5} />}>
-                신고하기
-              </Menu.Item>
-            </Menu.Dropdown>
-          </Menu>
-        </Group>
-      </Group>
-      <Space h="md" />
-      <Text>{comment.content}</Text>
-    </Paper>
+  const [{
+    value: commentContent,
+    // lastValidValue: _,
+    valid: isCommentContentValid,
+  }, setCommentContent] = useValidatedState<string>(
+    comment.content,
+    (content) => (content.length >= 2 && content.length <= 256),
+    (comment.content.length >= 2 && comment.content.length <= 256)
   );
+
+  const updateCommentInternal = async (content: string) => {
+    if (!isCommentContentValid) return;
+    const response = await updateComment(channelId, boardId, postId, commentId, { content });
+    comment.content = response.content;
+    setIsModifying(false);
+  };
+
+  const deleteCommentInternal = async () => {
+    await deleteComment(channelId, boardId, postId, commentId);
+    windows.location.reload();
+  };
+
+  const setCommentReaction = async (newIsUpvoting: number) => {
+    if (newIsUpvoting === NULL) {
+      await deleteCommentReaction(channelId, boardId, postId, commentId);
+      if (isUpvoting === TRUE) {
+        setUpvotes(upvotes - 1);
+      } else {
+        setDownvotes(downvotes - 1);
+      }
+      setIsUpvoting(NULL);
+    } else {
+      await updateCommentReaction(channelId, boardId, postId, commentId, (newIsUpvoting === TRUE));
+      if (isUpvoting !== NULL) {
+        if (newIsUpvoting === TRUE) {
+          setDownvotes(downvotes - 1);
+        } else {
+          setUpvotes(upvotes - 1);
+        }
+      }
+      if (newIsUpvoting === TRUE) {
+        setUpvotes(upvotes + 1);
+      } else {
+        setDownvotes(downvotes + 1);
+      }
+      setIsUpvoting(newIsUpvoting);
+    }
+  };
+
+  // console.log(isCommentUpvoting);
+  // console.log(isUpvoting);
+
+  useEffect(() => {}, [isModifying, isUpvoting]);
+
+  if (comment) {
+    return (
+      // <Paper withBorder radius="md" className={classes.comment}>
+      <Paper withBorder radius="md" p="xl">
+        <Group justify="space-between">
+          <Group>
+            <Avatar
+              src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-2.png"
+              alt="Jacob Warnhalter"
+              radius="xl"
+            />
+            <div>
+              <Text fz="sm">{comment.author}</Text>
+              <Text fz="xs" c="dimmed">{prettyTime(comment.createdAt)}</Text>
+            </div>
+          </Group>
+
+          <Group>
+            <ActionIcon
+              variant="transparent"
+              color="gray"
+              onClick={() => setCommentReaction(
+                (isUpvoting === TRUE)
+                ? NULL
+                : TRUE
+              )}
+            >
+              {
+                (isUpvoting === TRUE)
+                ? <IconThumbUpFilled stroke={1.5} />
+                : <IconThumbUp stroke={1.5} />
+              }
+            </ActionIcon>
+            <Text>{metricNumber(upvotes)}</Text>
+            <ActionIcon
+              variant="transparent"
+              color="gray"
+              onClick={() => setCommentReaction(
+                (isUpvoting === FALSE)
+                ? NULL
+                : FALSE
+              )}
+            >
+              {
+                (isUpvoting === FALSE)
+                ? <IconThumbDownFilled stroke={1.5} />
+                : <IconThumbDown stroke={1.5} />
+              }
+            </ActionIcon>
+            <Text>{metricNumber(downvotes)}</Text>
+
+            {
+              (comment.memberId === memberId) ?
+              (
+                <Menu>
+                  <Menu.Target>
+                    <ActionIcon variant="transparent" color="gray">
+                      <IconDots stroke={1.5} />
+                    </ActionIcon>
+                  </Menu.Target>
+
+                  <Menu.Dropdown>
+                    {/* <Menu.Item leftSection={<IconFlag stroke={1.5} />}>
+                      신고하기
+                    </Menu.Item> */}
+                    <Menu.Item
+                      leftSection={<IconPencil stroke={1.5} />}
+                      onClick={() => setIsModifying(true)}
+                    >
+                      수정
+                    </Menu.Item>
+                    <Menu.Item
+                      leftSection={<IconTrash stroke={1.5} />}
+                      onClick={() => deleteCommentInternal()}
+                    >
+                      삭제
+                    </Menu.Item>
+                  </Menu.Dropdown>
+                </Menu>
+              ) : <></>
+            }
+          </Group>
+        </Group>
+        <Space h="xl" />
+        <Group>
+          {isModifying
+            ? (
+              <TextInput
+                value={commentContent}
+                onChange={(event) => setCommentContent(event.currentTarget.value)}
+                rightSection={
+                  <>
+                    <ActionIcon
+                      onClick={() => updateCommentInternal(commentContent)}
+                    >
+                      <IconDeviceFloppy />
+                    </ActionIcon>
+                  </>
+                }
+                error={isCommentContentValid ? '' : '댓글은 2자 이상 256자 이하로 작성해주세요'}
+              />
+            )
+            : <Text component="div">{comment.content}</Text>
+          }
+        </Group>
+      </Paper>
+    );
+  }
 }

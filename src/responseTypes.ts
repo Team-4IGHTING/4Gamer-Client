@@ -1,12 +1,22 @@
-export type CommentResponse = {
+export type BoardResponse = {
   id: bigint,
-  content: string,
-  author: string,
-  upvotes: bigint,
-  downvotes: bigint,
+  title: string,
   createdAt: string,
   updatedAt: string
 };
+
+export type PostSimplifiedResponse = {
+  id: bigint,
+  title: string,
+  view: bigint,
+  upvotes: bigint,
+  downvotes: bigint,
+  author: string,
+  memberId: string,
+  createdAt: string,
+  attachment: string | null
+};
+
 export type PostResponse = {
   id: bigint,
   title: string,
@@ -17,19 +27,29 @@ export type PostResponse = {
   createdAt: string,
   updatedAt: string,
   author: string,
+  memberId: string,
   board: BoardResponse,
-  attachment: string | undefined
+  attachment: string | null
 };
 
-export type BoardResponse = {
+export type CommentResponse = {
   id: bigint,
-  title: string,
+  content: string,
+  memberId: string,
+  author: string,
+  upvotes: bigint,
+  downvotes: bigint,
   createdAt: string,
   updatedAt: string
 };
 
 export type PostTagResponse = {
   name: string
+};
+
+export type ReactionResponse = {
+  id: number;
+  isUpvoting: boolean;
 };
 
 export type S3GetResponseDto = {

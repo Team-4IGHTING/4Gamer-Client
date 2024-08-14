@@ -1,24 +1,62 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ActionIcon, Avatar, Badge, Group, Paper, Stack, Text, Title, UnstyledButton } from '@mantine/core';
-import { IconThumbUp, IconThumbDown, IconEye, IconMessage } from '@tabler/icons-react';
+
+import { ActionIcon, Avatar, Group, Menu, Paper, Stack, Text, Title, Tooltip, UnstyledButton } from '@mantine/core';
+import { IconDots, IconEye, IconPencil, IconThumbDown, IconThumbDownFilled, IconThumbUp, IconThumbUpFilled, IconTrash } from '@tabler/icons-react';
+
+import { updatePostReaction, deletePostReaction } from '@api/reaction';
 
 import { prettyTime } from '@/util/dateUtil';
 import { metricNumber } from '@/util/numberUtil';
-import { PostResponse } from '@/responseTypes';
+import { PostSimplifiedResponse } from '@/responseTypes';
 
-// const mockData = {
-//   id: 1,
-//   title: 'Awesome Title because the line is so long that the whole content will not be shown IDK why it all being shown',
-//   view: 10000000,
-//   upvotes: 10000000,
-//   downvotes: 10000000,
-//   author: 'Strafeinheit',
-//   createdAt: '2022-05-05T05:00:00Z',
-//   comments: 10000000,
-//   tags: ['#Tag1', '#Tag2', '#Tag3'],
-// };
+export function PostSummary({ channelId, boardId, postId, post }:
+  { channelId: bigint, boardId: bigint, postId: bigint,
+    post: PostSimplifiedResponse & { isUpvoting: number } }) {
+  const NULL = 0;
+  const FALSE = 1;
+  const TRUE = 2;
 
-export function PostSummary({ post }: { post: PostResponse }) {
+  const memberId = localStorage.getItem('4gamer_member_id');
+
+  const deletePostInternal = async () => {
+    await deletePost(channelId, boardId, postId);
+    window.location.reload();
+  };
+
+  const [isUpvoting, setIsUpvoting] = useState<number>(post.isUpvoting);
+  const [upvotes, setUpvotes] = useState<number>(post.upvotes);
+  const [downvotes, setDownvotes] = useState<number>(post.downvotes);
+
+  const setPostReaction = async (newIsUpvoting: number) => {
+    if (newIsUpvoting === NULL) {
+      await deletePostReaction(channelId, boardId, postId);
+      if (isUpvoting === TRUE) {
+        setUpvotes(upvotes - 1);
+      } else {
+        setDownvotes(downvotes - 1);
+      }
+      setIsUpvoting(NULL);
+    } else {
+      await updatePostReaction(channelId, boardId, postId, (newIsUpvoting === TRUE));
+      if (isUpvoting !== NULL) {
+        if (newIsUpvoting === TRUE) {
+          setDownvotes(downvotes - 1);
+        } else {
+          setUpvotes(upvotes - 1);
+        }
+      }
+      if (newIsUpvoting === TRUE) {
+        setUpvotes(upvotes + 1);
+      } else {
+        setDownvotes(downvotes + 1);
+      }
+      setIsUpvoting(newIsUpvoting);
+    }
+  };
+
+  useEffect(() => {}, [isUpvoting]);
+
   return (
       <Paper shadow="xs" withBorder p="xl">
         <Stack>
@@ -28,25 +66,52 @@ export function PostSummary({ post }: { post: PostResponse }) {
               <Text>{post.author}</Text>
               <Text>{prettyTime(post.createdAt)}</Text>
             </Group>
-            {/* <Group>
+            <Group>
               {
-                post.tags.map((tag, index) =>
-                  <Badge key={index} color="blue">
-                    {tag}
-                  </Badge>
-                )
+                (post.memberId === memberId) ?
+                (
+                  <Menu>
+                    <Menu.Target>
+                      <ActionIcon variant="transparent" color="gray">
+                        <IconDots stroke={1.5} />
+                      </ActionIcon>
+                    </Menu.Target>
+
+                    <Menu.Dropdown>
+                      {/* <Menu.Item leftSection={<IconFlag stroke={1.5} />}>
+                        신고하기
+                      </Menu.Item> */}
+                      <Menu.Item
+                        leftSection={<IconPencil stroke={1.5} />}
+                        component={Link}
+                        to={`./${postId}/edit`}
+                        relative="path"
+                      >
+                        수정
+                      </Menu.Item>
+                      <Menu.Item
+                        leftSection={<IconTrash stroke={1.5} />}
+                        onClick={() => deletePostInternal()}
+                      >
+                        삭제
+                      </Menu.Item>
+                    </Menu.Dropdown>
+                  </Menu>
+                ) : <></>
               }
-            </Group> */}
+            </Group>
           </Group>
 
           <Group justify="space-between">
-            <UnstyledButton component={Link} to={`./${post.id}`} relative="path" w="70%">
+            <UnstyledButton component={Link} to={`./${post.id}`} relative="path">
               <Title order={3} lineClamp={1}>{post.title}</Title>
             </UnstyledButton>
-            <Group justify="space-between" w="360">
+            <Group justify="space-between" w="300">
               <Group>
                 <IconEye stroke={1.5} />
-                <Text>{metricNumber(post.view)}</Text>
+                <Tooltip label={post.view}>
+                  <Text>{metricNumber(post.view)}</Text>
+                </Tooltip>
               </Group>
               {/* <Group>
                 <ActionIcon variant="transparent" color="gray">
@@ -55,16 +120,44 @@ export function PostSummary({ post }: { post: PostResponse }) {
                 <Text>{metricNumber(post.comments)}</Text>
               </Group> */}
               <Group>
-                <ActionIcon variant="transparent" color="gray">
-                  <IconThumbUp stroke={1.5} />
+                <ActionIcon
+                  variant="transparent"
+                  color="gray"
+                  onClick={() => setPostReaction(
+                    (isUpvoting === TRUE)
+                    ? NULL
+                    : TRUE
+                  )}
+                >
+                  {
+                    (isUpvoting === TRUE)
+                    ? <IconThumbUpFilled stroke={1.5} />
+                    : <IconThumbUp stroke={1.5} />
+                  }
                 </ActionIcon>
-                <Text>{metricNumber(post.upvotes)}</Text>
+                <Tooltip label={upvotes}>
+                  <Text>{metricNumber(upvotes)}</Text>
+                </Tooltip>
               </Group>
               <Group>
-                <ActionIcon variant="transparent" color="gray">
-                  <IconThumbDown stroke={1.5} />
-                </ActionIcon>
-                <Text>{metricNumber(post.downvotes)}</Text>
+              <ActionIcon
+                variant="transparent"
+                color="gray"
+                onClick={() => setPostReaction(
+                  (isUpvoting === FALSE)
+                  ? NULL
+                  : FALSE
+                )}
+              >
+                {
+                  (isUpvoting === FALSE)
+                  ? <IconThumbDownFilled stroke={1.5} />
+                  : <IconThumbDown stroke={1.5} />
+                }
+              </ActionIcon>
+                <Tooltip label={downvotes}>
+                  <Text>{metricNumber(downvotes)}</Text>
+                </Tooltip>
               </Group>
             </Group>
           </Group>
