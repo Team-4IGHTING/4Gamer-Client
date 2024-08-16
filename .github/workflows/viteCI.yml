@@ -1,9 +1,6 @@
 name: Vite CI
 
 on:
-  push:
-    branches:
-      - feature/#33-cicd
   pull_request:
     branches:
       - develop
@@ -20,6 +17,9 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20' 
+      
+      - name: delete
+        run: rm -f yarn.lock package-lock.json
 
       - name: Install
         run: |
