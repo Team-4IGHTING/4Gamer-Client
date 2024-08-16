@@ -1,7 +1,7 @@
-import { client } from "./client";
+import { client } from './client';
 
 export const getChannels = async () => {
-    const response = await client.get("/api/v1/channels");
+    const response = await client.get('/api/v1/channels');
 
     return response.data;
 };
@@ -13,7 +13,7 @@ export const getChannelItem = async (channelId: any) => {
 };
 
 export const createChannel = async (request: request) => {
-    const response = await client.post("/api/v1/channels", request);
+    const response = await client.post('/api/v1/channels', request);
 
     return response.data;
 };
@@ -27,14 +27,11 @@ export const updateChannel = async (channelId: any, request: update) => {
 export const deleteChannel = async (channelId: any) => {
     const response = await client.delete(`/api/v1/channel-admin/channels/${channelId}`);
 
-
     return response.data;
 };
 
-
 export const searchGameTitle = async (gameTitle: any) => {
     const response = await client.post(`/api/v1/igdb/get-name?gameTitle=${gameTitle}`);
-
 
     return response.data;
 };
@@ -45,9 +42,8 @@ export const topPost = async (channelId: any) => {
     return response.data;
 };
 
-
-export const checkBlack = async (channelId: any) => {
-    const response = await client.get(`/api/v1/channel-admin/channels/${channelId}`);
+export const getTopPostList = async (channelId: number) => {
+    const response = await client.get(`/api/v1/channels/${channelId}/top-posts`);
 
     return response.data;
 };
@@ -72,7 +68,7 @@ export const removeBlackList = async (channelId: string, memberId: string) => {
     }
 };
 
-export const getBlacklist = async (channelId: any) => {
+export const getBlacklist = async (channelId: string) => {
     const response = await client.get(`/api/v1/channel-admin/channels/${channelId}/blacklists`);
     return response.data;
 };

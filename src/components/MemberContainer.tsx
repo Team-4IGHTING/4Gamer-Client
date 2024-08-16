@@ -82,6 +82,7 @@ export function MemberContainer() {
   const handleLogout = async () => {
     webSocketDisconnection();
     localStorage.removeItem("accessToken");
+    localStorage.removeItem('notificationList');
     navigate("/");
   };
 
@@ -188,6 +189,7 @@ export function MemberContainer() {
         onClose={() => setModalOpen(prev => ({ ...prev, nickname: false }))}
         title="닉네임 변경"
         size="lg"
+        centered
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <TextInput 
@@ -212,6 +214,7 @@ export function MemberContainer() {
         onClose={() => setModalOpen(prev => ({ ...prev, password: false }))}
         title="비밀번호 변경"
         size="lg"
+        centered
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <TextInput 
