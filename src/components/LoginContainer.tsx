@@ -18,6 +18,7 @@ import {
   Anchor,
   Stack,
 } from '@mantine/core';
+import axios from 'axios';
 
 
 export function LoginContainer() {
@@ -67,6 +68,9 @@ export function LoginContainer() {
           console.log("data :>> ", data);
           alert('회원 가입이 완료되었습니다. 로그인을 진행해주세요.');
         } catch (error) {
+          if (axios.isAxiosError(error)) {
+            alert(error.response?.data.message)
+          }
           console.error("Failed to check robot status:", error);
         }
 
@@ -94,6 +98,7 @@ export function LoginContainer() {
           alert('환영합니다.');
           navigate("/main");
         } catch (error) {
+          alert('인증에 실패했습니다. 다시 시도해 주세요.');
           console.error("Failed to check robot status:", error);
         }
       }
