@@ -127,7 +127,7 @@ export function ChannelAdminPage() {
 
     const handleCreateClick = () => navigate(`/channels/${channelId}/boards/new`);
 
-    const handleblackClick = () => navigate(`/blacklist/${channelId}`);
+    const handleblackClick = () => navigate(`/channels/${channelId}/admin/blacklist`);
 
     const handleUpdateteClick = (boardId: string) => () => navigate(`/channels/${channelId}/boards/${boardId}/edit`);
 
