@@ -1,3 +1,4 @@
+import { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { AppShell, Burger, Group, Title, Button, UnstyledButton } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
@@ -6,7 +7,13 @@ import { ColorSchemeToggleButton } from '../ColorSchemeToggleButton/ColorSchemeT
 import WebsocketConnection from '../../layout/WebsocketConnection';
 
 export function PageFrame(
-  { bodyContent, navbarContent, asideContent, headerContent, footerContent }
+  { bodyContent, navbarContent, asideContent, headerContent, footerContent }: {
+    bodyContent: ReactNode,
+    navbarContent: ReactNode,
+    asideContent: ReactNode,
+    headerContent: ReactNode,
+    footerContent: ReactNode
+  }
 ) {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
@@ -35,10 +42,28 @@ export function PageFrame(
               <Title order={1}>4Gamer</Title>
             </UnstyledButton>
           </Group>
+          {headerContent}
           <Group>
-          <WebsocketConnection />
-            <Button variant="filled">Button</Button>
-            <Button variant="filled">Button</Button>
+            <WebsocketConnection />
+            <>
+              {localStorage.getItem('accessToken') ?
+                <Button
+                  variant="filled"
+                  component={Link}
+                  to="/member"
+                >
+                  내 정보
+                </Button>
+                :
+                <Button
+                  variant="filled"
+                  component={Link}
+                  to="/login"
+                >
+                  로그인
+                </Button>
+              }
+            </>
             <ColorSchemeToggleButton />
             <Burger opened={mobileAsideOpened} onClick={toggleMobileAside} hiddenFrom="sm" size="sm" />
             <Burger opened={desktopAsideOpened} onClick={toggleDesktopAside} visibleFrom="sm" size="sm" />
