@@ -16,7 +16,8 @@ import Superscript from '@tiptap/extension-superscript';
 import SubScript from '@tiptap/extension-subscript';
 
 import { getBoard, getBoards } from '@api/boardApi';
-import { getBlacklist, getChannelItem } from '@api/channelApi';
+import { checkBlack, getChannelItem } from '@api/channelApi';
+import { getMemberInfo } from '@api/member';
 import { getPost, getTagsInPost, updatePost } from '@api/posts';
 import { getImages, getPresignedUrl, deleteImage } from '@api/fileUpload';
 
@@ -24,7 +25,7 @@ import { TextEditor } from '@components/TextEditor/TextEditor';
 import { PageFrame } from '@components/Common/PageFrame/PageFrame';
 import { TopPost } from '@components/channels/topPost';
 
-import { BoardResponse, ChannelBlacklistResponse, PostResponse, PostTagResponse } from '@/responseTypes';
+import { BoardResponse, PostResponse, PostTagResponse } from '@/responseTypes';
 
 async function uploadToS3(url: string, file: File, contentType: string) {
   return axios.put(
@@ -92,10 +93,14 @@ export function PostEditPage() {
   const editorRef = useRef<Editor>(null);
 
   const checkBlacklists = async () => {
-    const data = await getBlacklist(`${channelId}`);
-    if (data.some((each: ChannelBlacklistResponse) => each.memberId === memberId)) {
-      alert('해당 채널로의 접근이 차단되었습니다. 관리자에게 문의하세요.');
+    const accessToken = localStorage.getItem('accessToken');
+    if (accessToken != null) {
+      const data = await getMemberInfo(accessToken);
+      localStorage.setItem('4gamer_member_id', data.id);
+    }
+    if (await checkBlack(channelId)) {
       navigate('/');
+      alert('해당 채널로의 접근이 차단되었습니다. 관리자에게 문의하세요.');
     }
   };
 
@@ -251,11 +256,11 @@ export function PostEditPage() {
     <Title order={3}>{channelTitle} / {boardTitle} / 게시물 수정</Title>
   );
 
-  if (post!.memberId !== memberId) {
-    alert('해당 페이지에 대한 수정 권한이 없습니다.');
-    navigate('../');
-  }
   if (post) {
+    if (post!.memberId !== memberId) {
+      navigate('../');
+      alert('해당 페이지에 대한 수정 권한이 없습니다.');
+    }
     return (
       <>
         <PageFrame

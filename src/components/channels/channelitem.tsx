@@ -1,6 +1,9 @@
 import { Card, Text, Badge, Button, Group, Container, Space, Flex, TextInput } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
+
+import { TopGameContainer } from '@components/TopGameContainer';
+
 import { getChannels } from '../../api/channelApi';
 import { useIsRobot } from '../../api/captchaApi';
 import { PageFrame } from '../Common/PageFrame/PageFrame';
@@ -106,7 +109,7 @@ const ChannelList = ({ fetchChannels }: ChannelListProps) => {
                 </Container>
             }
             navbarContent={undefined}
-            asideContent={undefined}
+            asideContent={<TopGameContainer />}
             headerContent={undefined}
             footerContent={undefined}
         />
