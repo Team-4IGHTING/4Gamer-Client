@@ -1,4 +1,4 @@
-import { Button, Container, Group, TextInput, Textarea, Autocomplete, Loader } from '@mantine/core';
+import { AppShell, Button, Container, Group, NavLink, TextInput, Textarea, Autocomplete, Loader } from '@mantine/core';
 import { useState, FormEvent, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createChannel, request, searchGameTitle } from '../../api/channelApi';
@@ -114,7 +114,13 @@ const ChannelCreate = () => {
 
           </Container>
         }
-        navbarContent={undefined}
+        navbarContent={
+          <>
+            <AppShell.Section>
+              <NavLink component="a" href="/game-reviews" label="게임 리뷰 페이지" />
+            </AppShell.Section>
+          </>
+        }
         asideContent={undefined}
         headerContent={undefined}
         footerContent={undefined}

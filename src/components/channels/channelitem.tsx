@@ -1,4 +1,4 @@
-import { Card, Text, Badge, Button, Group, Container, Space, Flex, TextInput } from '@mantine/core';
+import { AppShell, NavLink, Card, Text, Badge, Button, Group, Container, Space, Flex, TextInput } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 
@@ -108,7 +108,13 @@ const ChannelList = ({ fetchChannels }: ChannelListProps) => {
                     </div>
                 </Container>
             }
-            navbarContent={undefined}
+            navbarContent={
+                <>
+                  <AppShell.Section>
+                    <NavLink component="a" href="/game-reviews" label="게임 리뷰 페이지" />
+                  </AppShell.Section>
+                </>
+              }
             asideContent={<TopGameContainer />}
             headerContent={undefined}
             footerContent={undefined}

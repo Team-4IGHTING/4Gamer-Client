@@ -1,7 +1,7 @@
 import { useEffect, useState, Fragment } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { AppShell, Button, ScrollArea, NavLink, Stack, Title } from '@mantine/core';
+import { AppShell, Button, ScrollArea, NavLink, Space, Stack, Title } from '@mantine/core';
 
 import { getBoard, getBoards } from '@api/boardApi';
 import { checkBlack, getChannelItem } from '@api/channelApi';
@@ -108,6 +108,10 @@ export function PostListPage() {
 
   const postListNavbar = (
     <>
+      <AppShell.Section>
+        <NavLink component="a" href="/game-reviews" label="게임 리뷰 페이지" />
+      </AppShell.Section>
+      <Space h="md" />
       <AppShell.Section>게시판 목록</AppShell.Section>
       <AppShell.Section grow my="md" component={ScrollArea}>
         {

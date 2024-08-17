@@ -3,7 +3,7 @@ import { MouseEvent, useEffect, useRef, useState } from 'react';
 import { Link as RouterLink, useNavigate, useParams } from 'react-router-dom';
 import { v7 as uuid } from 'uuid';
 
-import { AppShell, ScrollArea, NavLink, TextInput, Text, Button, Fieldset, Stack, TagsInput, Title } from '@mantine/core';
+import { AppShell, ScrollArea, NavLink, TextInput, Text, Button, Fieldset, Space, Stack, TagsInput, Title } from '@mantine/core';
 import { useValidatedState } from '@mantine/hooks';
 import { Editor } from '@tiptap/react';
 import { Link } from '@mantine/tiptap';
@@ -241,6 +241,10 @@ export function PostEditPage() {
 
   const postEditNavbar = (
     <>
+      <AppShell.Section>
+        <NavLink component="a" href="/game-reviews" label="게임 리뷰 페이지" />
+      </AppShell.Section>
+      <Space h="md" />
       <AppShell.Section>게시판 목록</AppShell.Section>
       <AppShell.Section grow my="md" component={ScrollArea}>
         {

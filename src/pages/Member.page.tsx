@@ -14,6 +14,7 @@ const MemberPage = () => (
         }
         navbarContent={
           <>
+            <NavLink component="a" href="/game-reviews" label="게임 리뷰 페이지" />
             <NavLink
               component={Link}
               to="./"
