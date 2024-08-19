@@ -139,10 +139,6 @@ export function NewPostPage() {
 
   const checkBlacklists = async () => {
     setblack(await checkBlack(channelId))
-    // if (await checkBlack(channelId)) {
-    //   navigate('/');
-    //   alert('해당 채널로의 접근이 차단되었습니다. 관리자에게 문의하세요.');
-    // }
   };
 
   const fetchChannel = async () => {

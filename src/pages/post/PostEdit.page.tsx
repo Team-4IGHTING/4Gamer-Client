@@ -99,11 +99,7 @@ export function PostEditPage() {
       const data = await getMemberInfo(accessToken);
       localStorage.setItem('4gamer_member_id', data.id);
     } console.log(checkBlack(channelId))
-    // if (!await checkBlack(channelId)) {
     setblack(await checkBlack(channelId))
-    //   navigate('/');
-    //   alert('해당 채널로의 접근이 차단되었습니다. 관리자에게 문의하세요.');
-    // }
   };
 
   async function uploadImagesFrom(images: Array<any>, attachmentPrefix: string) {
