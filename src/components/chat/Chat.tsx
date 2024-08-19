@@ -1,7 +1,7 @@
 import { Button, Card, Group, ScrollArea, Text, Textarea, TextInput } from '@mantine/core';
 import { useEffect, useRef, useState } from 'react';
 import { IconX } from '@tabler/icons-react';
-import './Chat.css';
+// import './Chat.css';
 import { Client, StompSubscription } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { dateFormat } from '../../util/dateUtil';
