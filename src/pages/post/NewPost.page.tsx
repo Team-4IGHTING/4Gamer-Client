@@ -71,6 +71,7 @@ export function NewPostPage() {
   );
   const [boardTitle, setBoardTitle] = useState<string>('');
   const [channelTitle, setChannelTitle] = useState<string>('');
+  const [black, setblack] = useState<boolean>();
 
   const editorExtensions = [
     StarterKit,
@@ -108,6 +109,11 @@ export function NewPostPage() {
   }
 
   const uploadPost = async (event: MouseEvent) => {
+    if (black) {
+      navigate('/');
+      alert('해당 채널로의 접근이 차단되었습니다. 관리자에게 문의하세요.');
+      return;
+    }
     if (editorRef) {
       if (!isPostTitleValid) {
         alert('제목은 1자 이상 128자 이하로 정해 주세요.');
@@ -132,10 +138,11 @@ export function NewPostPage() {
   };
 
   const checkBlacklists = async () => {
-    if (await checkBlack(channelId)) {
-      navigate('/');
-      alert('해당 채널로의 접근이 차단되었습니다. 관리자에게 문의하세요.');
-    }
+    setblack(await checkBlack(channelId))
+    // if (await checkBlack(channelId)) {
+    //   navigate('/');
+    //   alert('해당 채널로의 접근이 차단되었습니다. 관리자에게 문의하세요.');
+    // }
   };
 
   const fetchChannel = async () => {
