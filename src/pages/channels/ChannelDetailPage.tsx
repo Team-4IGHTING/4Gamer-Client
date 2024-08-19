@@ -114,7 +114,7 @@ const ChannelDetailPage = () => {
     const handleUboardClick = (boardId: string) => () => navigate(`/channels/${channelId}/boards/${boardId}/posts`);
 
     const rows = sortedData.map((row) => (
-        <Table.Tr key={row.id} onClick={handleUboardClick(row.id)}>
+        <Table.Tr key={row.id} onClick={handleUboardClick(row.id)} style={{ cursor: 'pointer' }}>
             <Table.Td>{row.title}</Table.Td>
         </Table.Tr>
     ));
