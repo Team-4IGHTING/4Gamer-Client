@@ -8,7 +8,6 @@ import { PageFrame } from '../../components/Common/PageFrame/PageFrame';
 const ModifyBoard = () => {
     const [title, setTitle] = useState('');
     const [introduction, setIntroduction] = useState('');
-    const [alias, setAlias] = useState('');
     const [isLoading, setIsLoading] = useState(true);
 
     const { checkIsRobot } = useIsRobot();
@@ -23,7 +22,6 @@ const ModifyBoard = () => {
                 const board = await getBoard(channelId, boardId);
                 setTitle(board.title);
                 setIntroduction(board.introduction);
-                setAlias(board.alias);
             } catch (error) {
                 console.error('Error fetching board data:', error);
                 alert('Failed to load board data');
@@ -78,11 +76,6 @@ const ModifyBoard = () => {
                             label="Introduction"
                             value={introduction}
                             onChange={(e) => setIntroduction(e.target.value)}
-                        />
-                        <TextInput
-                            label="Alias"
-                            value={alias}
-                            readOnly
                         />
                         <br />
                         <Group justify='flex-end'>
