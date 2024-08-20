@@ -81,8 +81,7 @@ export function MemberContainer() {
 
   const handleLogout = async () => {
     webSocketDisconnection();
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem('notificationList');
+    localStorage.clear();
     navigate("/");
   };
 
